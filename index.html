@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MixLab — WAV → MP4</title>
+<style>
+:root{color-scheme:dark;--bg:#0d1017;--panel:#151a25;--panel2:#1c2331;--line:#30394b;--text:#f3f5fa;--muted:#a4aec0;--accent:#8b7cff;--accent2:#b5adff;--good:#72d6a1;--warn:#ffd17a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1a2040 0,#0d1017 48%);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:1080px;margin:0 auto;padding:28px 18px 60px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.eyebrow{color:var(--accent2);font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}h1{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:8px 0 10px;letter-spacing:-.04em}.sub{color:var(--muted);max-width:680px;margin:0}.pill{border:1px solid #45406f;color:#d4ceff;background:#242044;border-radius:99px;padding:8px 12px;font-size:12px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.panel{background:linear-gradient(180deg,rgba(25,31,45,.97),rgba(19,24,35,.97));border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 12px 35px #0002}.panel h2{font-size:17px;margin:0 0 14px}.upload{display:block;border:1px dashed #5a6380;border-radius:14px;padding:25px 18px;text-align:center;background:#111622;cursor:pointer;transition:.2s}.upload:hover{border-color:var(--accent);background:#17182b}.upload input{display:none}.upload .big{font-size:28px}.upload strong{display:block;margin:8px 0 4px}.muted{color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 8px}.row label{font-weight:650}.field{margin:16px 0}.field input[type=range]{width:100%;accent-color:var(--accent)}input[type=number],select{background:#101521;color:var(--text);border:1px solid var(--line);padding:9px;border-radius:9px}.btn{border:1px solid var(--line);background:#222a3a;color:var(--text);padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;transition:.15s}.btn:hover{filter:brightness(1.16)}.btn:disabled{opacity:.4;cursor:not-allowed}.primary{background:linear-gradient(135deg,#8b7cff,#6555dc);border-color:transparent;color:white}.btn.small{padding:5px 9px;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.tracklist{display:flex;flex-direction:column;gap:8px;margin-top:14px}.track{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#111622}.num{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#292448;color:#c9c2ff;font-weight:800;font-size:12px}.trackname{font-weight:650;overflow-wrap:anywhere}.trackmeta{color:var(--muted);font-size:12px}.trackcontrols{display:flex;gap:5px}.status{margin-top:14px;border-radius:10px;padding:11px 13px;background:#111622;color:var(--muted);font-size:13px;min-height:42px}.status.good{color:var(--good)}.status.warn{color:var(--warn)}.progress{height:5px;border-radius:9px;background:#30384a;overflow:hidden;margin-top:9px}.progress>div{height:100%;width:0;background:linear-gradient(90deg,#8b7cff,#71d6ff);transition:width .2s}.preview{width:100%;max-height:180px;object-fit:contain;border-radius:10px;background:#0c1018;margin-top:10px;display:none}.check{display:flex;gap:9px;align-items:center;color:var(--muted);font-size:13px}.check input{accent-color:var(--accent)}.footer{margin-top:18px;color:var(--muted);font-size:12px}.tag{font-size:11px;color:#c7c1ff;background:#282344;border-radius:6px;padding:3px 6px}.empty{padding:18px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);font-size:13px}.full{grid-column:1/-1}.hidden{display:none!important}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column}.pill{white-space:normal}.panel{padding:16px}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+  <div><div class="eyebrow">Audio workspace · local processing</div><h1>MixLab <span style="color:#a69cff">WAV → MP4</span></h1><p class="sub">Wczytaj długi plik WAV, wykryj utwory rozdzielone ciszą, ustaw kolejność i przejścia, a następnie wyeksportuj jeden miks MP4 z opcjonalną okładką.</p></div>
+  <div class="pill">🔒 Plik audio pozostaje na Twoim komputerze</div>
+</header>
+<div class="grid">
+<section class="panel">
+  <h2>01 / Plik źródłowy</h2>
+  <label class="upload" for="audioFile"><span class="big">🎵</span><strong>Wybierz plik WAV</strong><span class="muted">Kliknij lub przeciągnij plik tutaj · zalecany Chrome na komputerze</span><input id="audioFile" type="file" accept=".wav,audio/wav,audio/*"></label>
+  <div class="row"><span id="fileName" class="muted">Nie wybrano pliku</span><span id="duration" class="tag">—</span></div>
+  <div class="field"><div class="row"><label for="threshold">Próg ciszy</label><strong id="thresholdLabel">−42 dB</strong></div><input id="threshold" type="range" min="-60" max="-20" value="-42" step="1"><div class="muted">Niższy próg wykrywa tylko głębszą ciszę. Jeśli utwory są ściśnięte bez pełnej ciszy, spróbuj −35 dB.</div></div>
+  <div class="field"><div class="row"><label for="minSilence">Minimalna długość ciszy</label><strong><span id="silenceLabel">1,2</span> s</strong></div><input id="minSilence" type="range" min="0.3" max="4" value="1.2" step="0.1"></div>
+  <div class="field"><div class="row"><label for="trim">Zapas przy cięciu</label><strong><span id="trimLabel">0,15</span> s</strong></div><input id="trim" type="range" min="0" max="0.8" value="0.15" step="0.05"><div class="muted">Zostawia mały margines przed/po wykrytej ciszy, żeby nie ucinać końcówek.</div></div>
+  <div class="actions"><button id="detectBtn" class="btn primary" disabled>Wykryj utwory</button><button id="resetBtn" class="btn" disabled>Wyczyść</button></div>
+</section>
+<section class="panel">
+  <h2>02 / Ustawienia miksu</h2>
+  <div class="field"><div class="row"><label for="crossfade">Crossfade między utworami</label><strong><span id="fadeLabel">3,0</span> s</strong></div><input id="crossfade" type="range" min="0" max="5" value="3" step="0.25"><div class="muted">Utwory nakładają się i płynnie przechodzą jeden w drugi. Długość przejścia jest automatycznie ograniczana dla krótkich utworów.</div></div>
+  <div class="field"><div class="row"><label for="order">Kolejność utworów</label></div><select id="order"><option value="manual">Ręczna (według listy poniżej)</option><option value="shuffle">Losowa</option><option value="shortlong">Od najkrótszego</option><option value="longshort">Od najdłuższego</option></select></div>
+  <div class="field"><div class="row"><label for="coverFile">Grafika do MP4 (opcjonalnie)</label></div><label class="upload" style="padding:15px" for="coverFile"><strong>🖼️ Wybierz okładkę</strong><span class="muted">JPG, PNG lub WebP</span><input id="coverFile" type="file" accept="image/*"></label><img id="coverPreview" class="preview" alt="Podgląd okładki"><label class="check" style="margin-top:10px"><input id="coverOnly" type="checkbox" checked> Dopasuj okładkę do kadru 16:9</label></div>
+  <div class="field"><div class="row"><label for="quality">Jakość audio w MP4</label></div><select id="quality"><option value="192k">Wysoka — 192 kb/s</option><option value="256k">Bardzo wysoka — 256 kb/s</option><option value="320k">Maksymalna — 320 kb/s</option></select></div>
+  <div class="actions"><button id="mixBtn" class="btn primary" disabled>Utwórz miks WAV</button><button id="exportBtn" class="btn primary" disabled>Eksportuj MP4</button></div>
+</section>
+<section class="panel full">
+  <div class="row"><h2 style="margin:0">03 / Wykryte utwory</h2><span id="trackCount" class="tag">0 utworów</span></div>
+  <p class="muted">Po wykryciu możesz przesuwać utwory w górę/dół albo usuwać fałszywe podziały. Lista określa kolejność ręczną.</p>
+  <div id="tracks" class="tracklist"><div class="empty">Najpierw wybierz plik WAV i kliknij „Wykryj utwory”.</div></div>
+  <div id="status" class="status">Gotowy. Wszystkie obliczenia audio odbywają się w tej karcie przeglądarki.</div><div class="progress"><div id="progressBar"></div></div>
+  <div class="actions"><a id="wavDownload" class="btn hidden" download="mix.wav">Pobierz miks WAV</a><a id="mp4Download" class="btn primary hidden" download="mix.mp4">Pobierz gotowy MP4</a></div>
+  <div class="footer">Eksport MP4 wykorzystuje FFmpeg.wasm ładowany z CDN, więc przy pierwszym eksporcie wymagane jest połączenie z internetem. Sam plik WAV i grafika nie są wysyłane na serwer. Duże pliki mogą wymagać sporej ilości wolnej pamięci RAM. Dla najlepszej kompatybilności używaj najnowszego Chrome.</div>
+</section>
+</div>
+</main>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+let audioBuffer=null, sourceFile=null, tracks=[], coverFile=null, mixBlob=null, ffmpeg=null, ffmpegLoaded=false;
+const fmtTime = s => {s=Math.max(0,s);const m=Math.floor(s/60),sec=(s%60).toFixed(1).padStart(4,'0');return `${m}:${sec}`};
+const fmtNum = n => Number(n).toLocaleString('pl-PL',{minimumFractionDigits:1,maximumFractionDigits:2});
+function status(msg,kind=''){ $('status').textContent=msg;$('status').className='status '+kind; }
+function progress(v){$('progressBar').style.width=Math.max(0,Math.min(100,v))+'%';}
+function clearDownloads(){ $('wavDownload').classList.add('hidden');$('mp4Download').classList.add('hidden'); }
+function reset(){audioBuffer=null;sourceFile=null;tracks=[];coverFile=null;mixBlob=null;$('fileName').textContent='Nie wybrano pliku';$('duration').textContent='—';$('detectBtn').disabled=true;$('resetBtn').disabled=true;$('mixBtn').disabled=true;$('exportBtn').disabled=true;$('tracks').innerHTML='<div class="empty">Najpierw wybierz plik WAV i kliknij „Wykryj utwory”.</div>';$('trackCount').textContent='0 utworów';$('coverPreview').style.display='none';clearDownloads();progress(0);status('Gotowy. Wszystkie obliczenia audio odbywają się w tej karcie przeglądarki.');}
+$('audioFile').addEventListener('change', async e=>{
+ const f=e.target.files[0]; if(!f)return; reset(); sourceFile=f; $('fileName').textContent=f.name;
+ status('Wczytuję i dekoduję audio…');$('detectBtn').disabled=true;
+ try {const ctx=new (window.AudioContext||window.webkitAudioContext)();const ab=await f.arrayBuffer();audioBuffer=await ctx.decodeAudioData(ab);await ctx.close();$('duration').textContent=fmtTime(audioBuffer.duration);$('detectBtn').disabled=false;$('resetBtn').disabled=false;status(`Wczytano ${audioBuffer.numberOfChannels} kanał(y), ${audioBuffer.sampleRate} Hz. Gotowe do wykrywania ciszy.`,'good');}
+ catch(err){audioBuffer=null;status('Nie udało się odczytać pliku. Upewnij się, że to poprawny WAV obsługiwany przez Chrome. Szczegóły: '+err.message,'warn');}
+});
+$('resetBtn').onclick=()=>{ $('audioFile').value='';reset(); };
+$('threshold').oninput=()=> $('thresholdLabel').textContent='−'+Math.abs(+$('threshold').value)+' dB';
+$('minSilence').oninput=()=> $('silenceLabel').textContent=fmtNum(+$('minSilence').value);
+$('trim').oninput=()=> $('trimLabel').textContent=fmtNum(+$('trim').value);
+$('crossfade').oninput=()=> $('fadeLabel').textContent=fmtNum(+$('crossfade').value);
+$('coverFile').onchange=e=>{coverFile=e.target.files[0]||null;if(coverFile){const img=$('coverPreview');img.src=URL.createObjectURL(coverFile);img.style.display='block';}else $('coverPreview').style.display='none';};
+function detectTracks(){
+ if(!audioBuffer)return; status('Analizuję poziom sygnału i szukam ciszy…');progress(0);$('detectBtn').disabled=true;
+ setTimeout(()=>{
+ try{
+  const sr=audioBuffer.sampleRate, len=audioBuffer.length, ch=audioBuffer.numberOfChannels;
+  const block=Math.max(256,Math.floor(sr*0.05)), threshold=Math.pow(10,(+$('threshold').value)/20), minSilence=+$('minSilence').value, trim=+$('trim').value;
+  const channels=Array.from({length:ch},(_,i)=>audioBuffer.getChannelData(i));
+  let quietStart=-1, gaps=[], prev=0;
+  for(let p=0;p<len;p+=block){
+   const end=Math.min(len,p+block);let sum=0,count=0;
+   for(let c=0;c<ch;c++){const a=channels[c];for(let i=p;i<end;i+=4){sum+=a[i]*a[i];count++;}}
+   const rms=Math.sqrt(sum/Math.max(1,count));const t=p/sr;
+   if(rms<threshold){if(quietStart<0)quietStart=t;}
+   else if(quietStart>=0){const qEnd=t;if(qEnd-quietStart>=minSilence)gaps.push({start:quietStart,end:qEnd});quietStart=-1;}
+   prev=end;
+   if(p%(block*200)===0)progress(10+80*p/len);
+  }
+  if(quietStart>=0&&len/sr-quietStart>=minSilence)gaps.push({start:quietStart,end:len/sr});
+  let bounds=[0];for(const g of gaps){const cut=(g.start+g.end)/2;if(cut>bounds[bounds.length-1]+1)bounds.push(cut);}bounds.push(audioBuffer.duration);
+  let found=[];
+  for(let i=0;i<bounds.length-1;i++){
+   let start=bounds[i],end=bounds[i+1];
+   if(i>0)start=Math.max(start, (gaps[i-1]?.end ?? start)-trim);
+   if(i<gaps.length)end=Math.min(end, (gaps[i]?.start ?? end)+trim);
+   start=Math.max(0,start);end=Math.min(audioBuffer.duration,end);
+   if(end-start>=1)found.push({id:crypto.randomUUID(),start,end,label:`Utwór ${found.length+1}`});
+  }
+  if(found.length===0)found=[{id:crypto.randomUUID(),start:0,end:audioBuffer.duration,label:'Całe nagranie'}];
+  tracks=found;renderTracks();$('mixBtn').disabled=false;status(`Znaleziono ${tracks.length} fragment(ów). Sprawdź granice i kolejność przed miksowaniem.`,'good');progress(100);
+ }catch(err){status('Błąd analizy: '+err.message,'warn');}
+ $('detectBtn').disabled=false;
+ },30);
+}
+$('detectBtn').onclick=detectTracks;
+function renderTracks(){
+ const order=$('order').value;
+ if(order==='shuffle')tracks.sort(()=>Math.random()-.5);
+ if(order==='shortlong')tracks.sort((a,b)=>(a.end-a.start)-(b.end-b.start));
+ if(order==='longshort')tracks.sort((a,b)=>(b.end-b.start)-(a.end-a.start));
+ $('trackCount').textContent=`${tracks.length} ${tracks.length===1?'utwór':tracks.length<5?'utwory':'utworów'}`;
+ if(!tracks.length){$('tracks').innerHTML='<div class="empty">Brak wykrytych utworów.</div>';return;}
+ $('tracks').innerHTML='';
+ tracks.forEach((t,i)=>{
+  const el=document.createElement('div');el.className='track';
+  const num=document.createElement('div');num.className='num';num.textContent=String(i+1).padStart(2,'0');
+  const info=document.createElement('div');info.innerHTML=`<div class="trackname"></div><div class="trackmeta">${fmtTime(t.start)} – ${fmtTime(t.end)} · ${fmtTime(t.end-t.start)}</div>`;info.querySelector('.trackname').textContent=t.label;
+  const controls=document.createElement('div');controls.className='trackcontrols';
+  const up=document.createElement('button');up.className='btn small';up.textContent='↑';up.title='Przesuń w górę';up.disabled=i===0;up.onclick=()=>{[tracks[i-1],tracks[i]]=[tracks[i],tracks[i-1]];renderTracks();};
+  const down=document.createElement('button');down.className='btn small';down.textContent='↓';down.title='Przesuń w dół';down.disabled=i===tracks.length-1;down.onclick=()=>{[tracks[i+1],tracks[i]]=[tracks[i],tracks[i+1]];renderTracks();};
+  const del=document.createElement('button');del.className='btn small';del.textContent='×';del.title='Usuń fragment';del.onclick=()=>{tracks.splice(i,1);renderTracks();$('mixBtn').disabled=!tracks.length;};
+  controls.append(up,down,del);el.append(num,info,controls);$('tracks').append(el);
+ });
+}
+$('order').onchange=()=>{renderTracks();};
+function makeMix(){
+ if(!audioBuffer||!tracks.length)return;
+ $('mixBtn').disabled=true;$('exportBtn').disabled=true;clearDownloads();status('Tworzę miks audio…');progress(0);
+ setTimeout(()=>{
+ try{
+  const sr=audioBuffer.sampleRate,ch=audioBuffer.numberOfChannels, fadeReq=+$('crossfade').value;
+  const parts=tracks.map(t=>({start:Math.floor(t.start*sr),end:Math.floor(t.end*sr)})).filter(t=>t.end>t.start);
+  const fadeFrames=Math.floor(fadeReq*sr);
+  let total=parts.reduce((n,p)=>n+p.end-p.start,0);
+  for(let i=1;i<parts.length;i++)total-=Math.min(fadeFrames,Math.floor((parts[i-1].end-parts[i-1].start)*.45),Math.floor((parts[i].end-parts[i].start)*.45));
+  total=Math.max(1,total);const out=Array.from({length:ch},()=>new Float32Array(total));let pos=0;
+  for(let pi=0;pi<parts.length;pi++){
+   const p=parts[pi], data=Array.from({length:ch},(_,c)=>audioBuffer.getChannelData(c).subarray(p.start,p.end));
+   if(pi>0){const prev=parts[pi-1];const overlap=Math.min(fadeFrames,Math.floor((prev.end-prev.start)*.45),Math.floor((p.end-p.start)*.45));const start=pos-overlap;
+    for(let c=0;c<ch;c++){const dst=out[c],src=data[c];for(let j=0;j<overlap;j++){const x=(j+1)/(overlap+1);dst[start+j]=dst[start+j]*Math.cos(x*Math.PI/2)+src[j]*Math.sin(x*Math.PI/2);}}
+    for(let c=0;c<ch;c++)out[c].set(data[c].subarray(overlap),start+overlap);
+    pos=start+(p.end-p.start);
+   }else{for(let c=0;c<ch;c++)out[c].set(data[c],pos);pos+=p.end-p.start;}
+   progress(10+80*(pi+1)/parts.length);
+  }
+  // Write PCM16 WAV
+  const actualLen=pos, wav=encodeWav(out.map(a=>a.subarray(0,actualLen)),sr);mixBlob=new Blob([wav],{type:'audio/wav'});
+  const url=URL.createObjectURL(mixBlob);$('wavDownload').href=url;$('wavDownload').classList.remove('hidden');$('wavDownload').download=(sourceFile?.name.replace(/\.[^.]+$/,'')||'mix')+'_mix.wav';
+  $('exportBtn').disabled=false;status(`Gotowy miks: ${fmtTime(actualLen/sr)}. Możesz pobrać WAV albo wyeksportować MP4.`,'good');progress(100);
+ }catch(err){status('Nie udało się utworzyć miksu: '+err.message,'warn');}
+ $('mixBtn').disabled=false;
+ },40);
+}
+function encodeWav(channels,sr){
+ const ch=channels.length,n=channels[0].length,bytes=44+n*ch*2,buf=new ArrayBuffer(bytes),v=new DataView(buf);
+ const str=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+ str(0,'RIFF');v.setUint32(4,bytes-8,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,sr,true);v.setUint32(28,sr*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,bytes-44,true);
+ let o=44;for(let i=0;i<n;i++)for(let c=0;c<ch;c++){let s=Math.max(-1,Math.min(1,channels[c][i]));v.setInt16(o,s<0?s*32768:s*32767,true);o+=2;}return buf;
+}
+$('mixBtn').onclick=makeMix;
+async function loadFFmpeg(){
+ if(ffmpegLoaded)return ffmpeg;
+ status('Ładuję moduł eksportu MP4 z internetu (tylko przy pierwszym użyciu)…');progress(5);
+ const {FFmpeg}=await import('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
+ const {toBlobURL}=await import('https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js');
+ ffmpeg=new FFmpeg();
+ ffmpeg.on('progress',({progress:p})=>progress(10+Math.max(0,Math.min(1,p))*85));
+ ffmpeg.on('log',({message})=>{if(/error/i.test(message))console.warn(message);});
+ const base='https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+ await ffmpeg.load({coreURL:await toBlobURL(base+'/ffmpeg-core.js','text/javascript'),wasmURL:await toBlobURL(base+'/ffmpeg-core.wasm','application/wasm')});
+ ffmpegLoaded=true;return ffmpeg;
+}
+$('exportBtn').onclick=async()=>{
+ if(!mixBlob)return; $('exportBtn').disabled=true;$('mixBtn').disabled=true;clearDownloads();
+ try{
+  const f=await loadFFmpeg();status('Przygotowuję pliki do eksportu MP4…');
+  const wavBytes=new Uint8Array(await mixBlob.arrayBuffer());await f.writeFile('mix.wav',wavBytes);
+  const quality=$('quality').value;
+  if(coverFile){
+   await f.writeFile('cover.'+((coverFile.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')),new Uint8Array(await coverFile.arrayBuffer()));
+   const ext=(coverFile.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+   const coverName='cover.'+ext;
+   status('Koduję MP4 z okładką i dźwiękiem…');
+   await f.exec(['-loop','1','-framerate','2','-i',coverName,'-i','mix.wav','-map','0:v:0','-map','1:a:0','-c:v','libx264','-preset','ultrafast','-tune','stillimage','-pix_fmt','yuv420p','-vf',$('coverOnly').checked?'scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2':'scale=1280:720','-c:a','aac','-b:a',quality,'-shortest','-movflags','+faststart','mix.mp4']);
+  }else{
+   status('Koduję MP4 z czarnym tłem i dźwiękiem…');
+   await f.exec(['-f','lavfi','-i','color=c=black:s=1280x720:r=2','-i','mix.wav','-map','0:v:0','-map','1:a:0','-c:v','libx264','-preset','ultrafast','-tune','stillimage','-pix_fmt','yuv420p','-c:a','aac','-b:a',quality,'-shortest','-movflags','+faststart','mix.mp4']);
+  }
+  const data=await f.readFile('mix.mp4');const blob=new Blob([data.buffer.slice(data.byteOffset,data.byteOffset+data.byteLength)],{type:'video/mp4'});const url=URL.createObjectURL(blob);
+  $('mp4Download').href=url;$('mp4Download').download=(sourceFile?.name.replace(/\.[^.]+$/,'')||'mix')+'.mp4';$('mp4Download').classList.remove('hidden');
+  status(`Gotowe! MP4 ma ${ (blob.size/1024/1024).toLocaleString('pl-PL',{maximumFractionDigits:1}) } MB. Kliknij „Pobierz gotowy MP4”.`,'good');progress(100);
+ }catch(err){console.error(err);status('Eksport MP4 nie powiódł się. Sprawdź połączenie z internetem i wolną pamięć RAM. Szczegóły: '+(err.message||err),'warn');}
+ $('exportBtn').disabled=!mixBlob;$('mixBtn').disabled=!tracks.length;
+};
+reset();
+})();
+</script>
+</body>
+</html>
