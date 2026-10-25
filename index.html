@@ -15,7 +15,7 @@ main{max-width:1080px;margin:0 auto;padding:28px 18px 60px}.hero{display:flex;ju
 <body>
 <main>
 <header class="hero">
-  <div><div class="eyebrow">Audio workspace · local processing</div><h1>MixLab <span style="color:#a69cff">WAV → MP4</span></h1><p class="sub">Wczytaj długi plik WAV, wykryj utwory rozdzielone ciszą, ustaw kolejność i przejścia, a następnie wyeksportuj jeden miks MP4 z opcjonalną okładką.</p></div>
+  <div><div class="eyebrow">Audio workspace · local processing</div><h1>MixLab <span style="color:#a69cff">WAV → MP4</span></h1><p class="sub">Wczytaj WAV i wykrywaj utwory etapami. Zapisz miks WAV na dysk, a potem wybierz go w eksporcie WebM. WebM jest zapisywany porcjami na dysk i można go przesłać do YouTube. Nagrywanie trwa w czasie rzeczywistym.</p></div>
   <div class="pill">🔒 Plik audio pozostaje na Twoim komputerze</div>
 </header>
 <div class="grid">
@@ -34,7 +34,7 @@ main{max-width:1080px;margin:0 auto;padding:28px 18px 60px}.hero{display:flex;ju
   <div class="field"><div class="row"><label for="order">Kolejność utworów</label></div><select id="order"><option value="manual">Ręczna (według listy poniżej)</option><option value="shuffle">Losowa</option><option value="shortlong">Od najkrótszego</option><option value="longshort">Od najdłuższego</option></select></div>
   <div class="field"><div class="row"><label for="coverFile">Grafika do MP4 (opcjonalnie)</label></div><label class="upload" style="padding:15px" for="coverFile"><strong>🖼️ Wybierz okładkę</strong><span class="muted">JPG, PNG lub WebP</span><input id="coverFile" type="file" accept="image/*"></label><img id="coverPreview" class="preview" alt="Podgląd okładki"><label class="check" style="margin-top:10px"><input id="coverOnly" type="checkbox" checked> Dopasuj okładkę do kadru 16:9</label></div>
   <div class="field"><div class="row"><label for="quality">Jakość audio w MP4</label></div><select id="quality"><option value="192k">Wysoka — 192 kb/s</option><option value="256k">Bardzo wysoka — 256 kb/s</option><option value="320k">Maksymalna — 320 kb/s</option></select></div>
-  <div class="actions"><button id="mixBtn" class="btn primary" disabled>Utwórz miks WAV</button><button id="exportBtn" class="btn primary" disabled>Eksportuj MP4</button></div>
+  <div class="actions"><button id="mixBtn" class="btn primary" disabled>Zapisz miks WAV na dysk</button><button id="webmBtn" class="btn primary" disabled>Eksportuj WebM z WAV</button><button id="exportBtn" class="btn" disabled>Eksportuj MP4 (niedostępne)</button></div>
 </section>
 <section class="panel full">
   <div class="row"><h2 style="margin:0">03 / Wykryte utwory</h2><span id="trackCount" class="tag">0 utworów</span></div>
@@ -42,25 +42,25 @@ main{max-width:1080px;margin:0 auto;padding:28px 18px 60px}.hero{display:flex;ju
   <div id="tracks" class="tracklist"><div class="empty">Najpierw wybierz plik WAV i kliknij „Wykryj utwory”.</div></div>
   <div id="status" class="status">Gotowy. Wszystkie obliczenia audio odbywają się w tej karcie przeglądarki.</div><div class="progress"><div id="progressBar"></div></div>
   <div class="actions"><a id="wavDownload" class="btn hidden" download="mix.wav">Pobierz miks WAV</a><a id="mp4Download" class="btn primary hidden" download="mix.mp4">Pobierz gotowy MP4</a></div>
-  <div class="footer">Eksport MP4 wykorzystuje FFmpeg.wasm ładowany z CDN, więc przy pierwszym eksporcie wymagane jest połączenie z internetem. Sam plik WAV i grafika nie są wysyłane na serwer. Duże pliki mogą wymagać sporej ilości wolnej pamięci RAM. Dla najlepszej kompatybilności używaj najnowszego Chrome.</div>
+  <div class="footer">Eksport MP4 pobiera FFmpeg z jsDelivr CDN (jednowątkowy silnik dla zgodności); pierwszy start wymaga internetu. Jeśli krok 3 kończy się timeoutem, najważniejszy będzie błąd z Chrome: naciśnij F12 → Console i skopiuj czerwony wpis. Sama zmiana CDN może nie wystarczyć, jeśli sieć blokuje pliki WASM lub Workery. Sam plik WAV i grafika nie są wysyłane na serwer. Duże pliki mogą wymagać sporej ilości wolnej pamięci RAM. Dla najlepszej kompatybilności używaj najnowszego Chrome.</div>
 </section>
 </div>
 </main>
 <script>
 (() => {
 const $ = id => document.getElementById(id);
-let audioBuffer=null, sourceFile=null, tracks=[], coverFile=null, mixBlob=null, ffmpeg=null, ffmpegLoaded=false;
+let audioBuffer=null, sourceFile=null, tracks=[], coverFile=null, mixBlob=null, ffmpeg=null, ffmpegLoaded=false, savedMixHandle=null;
 const fmtTime = s => {s=Math.max(0,s);const m=Math.floor(s/60),sec=(s%60).toFixed(1).padStart(4,'0');return `${m}:${sec}`};
 const fmtNum = n => Number(n).toLocaleString('pl-PL',{minimumFractionDigits:1,maximumFractionDigits:2});
 function status(msg,kind=''){ $('status').textContent=msg;$('status').className='status '+kind; }
 function progress(v){$('progressBar').style.width=Math.max(0,Math.min(100,v))+'%';}
 function clearDownloads(){ $('wavDownload').classList.add('hidden');$('mp4Download').classList.add('hidden'); }
-function reset(){audioBuffer=null;sourceFile=null;tracks=[];coverFile=null;mixBlob=null;$('fileName').textContent='Nie wybrano pliku';$('duration').textContent='—';$('detectBtn').disabled=true;$('resetBtn').disabled=true;$('mixBtn').disabled=true;$('exportBtn').disabled=true;$('tracks').innerHTML='<div class="empty">Najpierw wybierz plik WAV i kliknij „Wykryj utwory”.</div>';$('trackCount').textContent='0 utworów';$('coverPreview').style.display='none';clearDownloads();progress(0);status('Gotowy. Wszystkie obliczenia audio odbywają się w tej karcie przeglądarki.');}
+function reset(){audioBuffer=null;sourceFile=null;tracks=[];coverFile=null;mixBlob=null;savedMixHandle=null;$('fileName').textContent='Nie wybrano pliku';$('duration').textContent='—';$('detectBtn').disabled=true;$('resetBtn').disabled=true;$('mixBtn').disabled=true;$('exportBtn').disabled=true;$('tracks').innerHTML='<div class="empty">Najpierw wybierz plik WAV i kliknij „Wykryj utwory”.</div>';$('trackCount').textContent='0 utworów';$('coverPreview').style.display='none';clearDownloads();progress(0);status('Gotowy. Wszystkie obliczenia audio odbywają się w tej karcie przeglądarki.');}
 $('audioFile').addEventListener('change', async e=>{
- const f=e.target.files[0]; if(!f)return; reset(); sourceFile=f; $('fileName').textContent=f.name;
- status('Wczytuję i dekoduję audio…');$('detectBtn').disabled=true;
- try {const ctx=new (window.AudioContext||window.webkitAudioContext)();const ab=await f.arrayBuffer();audioBuffer=await ctx.decodeAudioData(ab);await ctx.close();$('duration').textContent=fmtTime(audioBuffer.duration);$('detectBtn').disabled=false;$('resetBtn').disabled=false;status(`Wczytano ${audioBuffer.numberOfChannels} kanał(y), ${audioBuffer.sampleRate} Hz. Gotowe do wykrywania ciszy.`,'good');}
- catch(err){audioBuffer=null;status('Nie udało się odczytać pliku. Upewnij się, że to poprawny WAV obsługiwany przez Chrome. Szczegóły: '+err.message,'warn');}
+ const f=e.target.files[0]; if(!f)return; reset(); sourceFile=f;
+ $('fileName').textContent=f.name;$('duration').textContent='analiza przy wykrywaniu';
+ $('detectBtn').disabled=false;$('resetBtn').disabled=false;
+ status(`Wybrano ${(f.size/1024/1024).toLocaleString('pl-PL',{maximumFractionDigits:0})} MB. Nie wczytuję całego pliku do pamięci na tym etapie.`,'good');
 });
 $('resetBtn').onclick=()=>{ $('audioFile').value='';reset(); };
 $('threshold').oninput=()=> $('thresholdLabel').textContent='−'+Math.abs(+$('threshold').value)+' dB';
@@ -68,38 +68,77 @@ $('minSilence').oninput=()=> $('silenceLabel').textContent=fmtNum(+$('minSilence
 $('trim').oninput=()=> $('trimLabel').textContent=fmtNum(+$('trim').value);
 $('crossfade').oninput=()=> $('fadeLabel').textContent=fmtNum(+$('crossfade').value);
 $('coverFile').onchange=e=>{coverFile=e.target.files[0]||null;if(coverFile){const img=$('coverPreview');img.src=URL.createObjectURL(coverFile);img.style.display='block';}else $('coverPreview').style.display='none';};
-function detectTracks(){
- if(!audioBuffer)return; status('Analizuję poziom sygnału i szukam ciszy…');progress(0);$('detectBtn').disabled=true;
- setTimeout(()=>{
+async function readWavInfo(file){
+ const head = new DataView(await file.slice(0,Math.min(file.size,1024*1024)).arrayBuffer());
+ const ascii=(off,n)=>Array.from({length:n},(_,i)=>String.fromCharCode(head.getUint8(off+i))).join('');
+ if(ascii(0,4)!=='RIFF'||ascii(8,4)!=='WAVE')throw new Error('Plik nie jest standardowym WAV RIFF.');
+ let off=12,fmt=null,data=null;
+ while(off+8<=head.byteLength){
+  const id=ascii(off,4), size=head.getUint32(off+4,true), body=off+8;
+  if(id==='fmt '&&body+16<=head.byteLength){
+   fmt={format:head.getUint16(body,true),channels:head.getUint16(body+2,true),sampleRate:head.getUint32(body+4,true),byteRate:head.getUint32(body+8,true),blockAlign:head.getUint16(body+12,true),bits:head.getUint16(body+14,true)};
+  } else if(id==='data'){data={offset:body,size};break;}
+  if(size<0||body+size>file.size)break;
+  off=body+size+(size%2);
+ }
+ if(!fmt||!data)throw new Error('Nie znaleziono nagłówka fmt/data w pierwszym 1 MB. WAV może mieć nietypową strukturę.');
+ if(![1,3].includes(fmt.format))throw new Error('Ten tryb oszczędzający pamięć obsługuje WAV PCM lub IEEE float. Ten plik używa innego kodowania.');
+ if(![8,16,24,32,64].includes(fmt.bits))throw new Error('Nieobsługiwana głębia bitowa WAV: '+fmt.bits);
+ const frames=Math.floor(data.size/fmt.blockAlign);
+ return {...fmt,...data,frames,duration:frames/fmt.sampleRate};
+}
+function sampleAt(view,offset,bits,format){
+ if(format===3&&bits===32)return view.getFloat32(offset,true);
+ if(format===3&&bits===64)return view.getFloat64(offset,true);
+ if(bits===8)return (view.getUint8(offset)-128)/128;
+ if(bits===16)return view.getInt16(offset,true)/32768;
+ if(bits===24){let x=view.getUint8(offset)|(view.getUint8(offset+1)<<8)|(view.getUint8(offset+2)<<16);if(x&0x800000)x|=0xff000000;return x/8388608;}
+ if(bits===32)return view.getInt32(offset,true)/2147483648;
+ throw new Error('Nieobsługiwany format próbek.');
+}
+async function detectTracks(){
+ if(!sourceFile)return; $('detectBtn').disabled=true;progress(0);
  try{
-  const sr=audioBuffer.sampleRate, len=audioBuffer.length, ch=audioBuffer.numberOfChannels;
-  const block=Math.max(256,Math.floor(sr*0.05)), threshold=Math.pow(10,(+$('threshold').value)/20), minSilence=+$('minSilence').value, trim=+$('trim').value;
-  const channels=Array.from({length:ch},(_,i)=>audioBuffer.getChannelData(i));
-  let quietStart=-1, gaps=[], prev=0;
-  for(let p=0;p<len;p+=block){
-   const end=Math.min(len,p+block);let sum=0,count=0;
-   for(let c=0;c<ch;c++){const a=channels[c];for(let i=p;i<end;i+=4){sum+=a[i]*a[i];count++;}}
-   const rms=Math.sqrt(sum/Math.max(1,count));const t=p/sr;
-   if(rms<threshold){if(quietStart<0)quietStart=t;}
-   else if(quietStart>=0){const qEnd=t;if(qEnd-quietStart>=minSilence)gaps.push({start:quietStart,end:qEnd});quietStart=-1;}
-   prev=end;
-   if(p%(block*200)===0)progress(10+80*p/len);
+  status('Odczytuję nagłówek WAV bez ładowania całego pliku…');
+  const info=await readWavInfo(sourceFile), threshold=Math.pow(10,(+$('threshold').value)/20), minSilence=+$('minSilence').value, trim=+$('trim').value;
+  const frameBytes=info.blockAlign, sampleBytes=info.bits/8, framesPerChunk=Math.max(4096,Math.floor(info.sampleRate*.5));
+  const gaps=[];let quietStart=-1, frame=0;const hop=Math.max(1,Math.floor(info.sampleRate*.05));
+  while(frame<info.frames){
+   const n=Math.min(framesPerChunk,info.frames-frame), byteStart=info.offset+frame*frameBytes, byteEnd=byteStart+n*frameBytes;
+   const buf=await sourceFile.slice(byteStart,byteEnd).arrayBuffer(), view=new DataView(buf);
+   for(let local=0;local<n;local+=hop){
+    const end=Math.min(n,local+hop);let sum=0,count=0;
+    for(let j=local;j<end;j+=4){
+     for(let c=0;c<info.channels;c++){const val=sampleAt(view,j*frameBytes+c*sampleBytes,info.bits,info.format);sum+=val*val;count++;}
+    }
+    const rms=Math.sqrt(sum/Math.max(1,count)), t=(frame+local)/info.sampleRate;
+    if(rms<threshold){if(quietStart<0)quietStart=t;}
+    else if(quietStart>=0){const qEnd=t;if(qEnd-quietStart>=minSilence)gaps.push({start:quietStart,end:qEnd});quietStart=-1;}
+   }
+   frame+=n;progress(5+85*frame/info.frames);
+   status(`Analiza pliku etapami: ${Math.round(100*frame/info.frames)}% · ${fmtTime(frame/info.sampleRate)} / ${fmtTime(info.duration)}`);
+   await new Promise(r=>setTimeout(r,0));
   }
-  if(quietStart>=0&&len/sr-quietStart>=minSilence)gaps.push({start:quietStart,end:len/sr});
-  let bounds=[0];for(const g of gaps){const cut=(g.start+g.end)/2;if(cut>bounds[bounds.length-1]+1)bounds.push(cut);}bounds.push(audioBuffer.duration);
+  if(quietStart>=0&&info.duration-quietStart>=minSilence)gaps.push({start:quietStart,end:info.duration});
+  const bounds=[0];for(const g of gaps){const cut=(g.start+g.end)/2;if(cut>bounds[bounds.length-1]+1)bounds.push(cut);}bounds.push(info.duration);
   let found=[];
   for(let i=0;i<bounds.length-1;i++){
    let start=bounds[i],end=bounds[i+1];
-   if(i>0)start=Math.max(start, (gaps[i-1]?.end ?? start)-trim);
-   if(i<gaps.length)end=Math.min(end, (gaps[i]?.start ?? end)+trim);
-   start=Math.max(0,start);end=Math.min(audioBuffer.duration,end);
-   if(end-start>=1)found.push({id:crypto.randomUUID(),start,end,label:`Utwór ${found.length+1}`});
+   if(i>0)start=Math.max(start,(gaps[i-1]?.end??start)-trim);
+   if(i<gaps.length)end=Math.min(end,(gaps[i]?.start??end)+trim);
+   if(end-start>=1)found.push({id:crypto.randomUUID(),start:Math.max(0,start),end:Math.min(info.duration,end),label:`Utwór ${found.length+1}`});
   }
-  if(found.length===0)found=[{id:crypto.randomUUID(),start:0,end:audioBuffer.duration,label:'Całe nagranie'}];
-  tracks=found;renderTracks();$('mixBtn').disabled=false;status(`Znaleziono ${tracks.length} fragment(ów). Sprawdź granice i kolejność przed miksowaniem.`,'good');progress(100);
- }catch(err){status('Błąd analizy: '+err.message,'warn');}
+  if(!found.length)found=[{id:crypto.randomUUID(),start:0,end:info.duration,label:'Całe nagranie'}];
+  tracks=found;
+  // Metadata-only buffer placeholder; WAV mix/export from browser requires decoding, so disable those controls with honest guidance.
+  audioBuffer=null;
+  renderTracks();
+  $('duration').textContent=fmtTime(info.duration);
+  $('mixBtn').disabled=false;$('exportBtn').disabled=true;
+  status(`Wykryto ${tracks.length} fragment(ów). Możesz teraz kliknąć „Zapisz miks WAV na dysk”. Zapis odbywa się etapami, bez trzymania całego wyniku w RAM-ie.`,'good');
+  progress(100);
+ }catch(err){console.error(err);status('Nie udało się analizować WAV etapami: '+err.message,'warn');}
  $('detectBtn').disabled=false;
- },30);
 }
 $('detectBtn').onclick=detectTracks;
 function renderTracks(){
@@ -122,33 +161,74 @@ function renderTracks(){
  });
 }
 $('order').onchange=()=>{renderTracks();};
-function makeMix(){
- if(!audioBuffer||!tracks.length)return;
- $('mixBtn').disabled=true;$('exportBtn').disabled=true;clearDownloads();status('Tworzę miks audio…');progress(0);
- setTimeout(()=>{
+async function exportLargeWav(){
+ if(!sourceFile||!tracks.length)return;
+ if(!window.showSaveFilePicker){
+  status('Ta wersja Chrome nie udostępnia zapisu strumieniowego. Zaktualizuj Chrome lub otwórz stronę w najnowszym Chrome. Dla pliku 1 GB nie użyję pobierania przez RAM, bo mogłoby znów zabraknąć pamięci.','warn');return;
+ }
+ $('mixBtn').disabled=true;$('exportBtn').disabled=true;clearDownloads();progress(0);
+ let writable=null;
  try{
-  const sr=audioBuffer.sampleRate,ch=audioBuffer.numberOfChannels, fadeReq=+$('crossfade').value;
-  const parts=tracks.map(t=>({start:Math.floor(t.start*sr),end:Math.floor(t.end*sr)})).filter(t=>t.end>t.start);
-  const fadeFrames=Math.floor(fadeReq*sr);
-  let total=parts.reduce((n,p)=>n+p.end-p.start,0);
-  for(let i=1;i<parts.length;i++)total-=Math.min(fadeFrames,Math.floor((parts[i-1].end-parts[i-1].start)*.45),Math.floor((parts[i].end-parts[i].start)*.45));
-  total=Math.max(1,total);const out=Array.from({length:ch},()=>new Float32Array(total));let pos=0;
+  status('Sprawdzam format WAV…');
+  const info=await readWavInfo(sourceFile);
+  if(info.format!==1||![8,16,24,32].includes(info.bits))throw new Error('Eksport strumieniowy obecnie obsługuje WAV PCM 8/16/24/32-bit.');
+  const sr=info.sampleRate,ch=info.channels,srcBytes=info.bits/8,frameBytes=info.blockAlign;
+  const parts=tracks.map(t=>({start:Math.max(0,Math.floor(t.start*sr)),end:Math.min(info.frames,Math.floor(t.end*sr))})).filter(p=>p.end>p.start);
+  if(!parts.length)throw new Error('Brak poprawnych fragmentów do eksportu.');
+  const fadeSeconds=Math.min(5,Math.max(0,+$('crossfade').value));
+  const fades=[];
+  for(let i=1;i<parts.length;i++)fades.push(Math.min(Math.floor(fadeSeconds*sr),Math.floor((parts[i-1].end-parts[i-1].start)*.45),Math.floor((parts[i].end-parts[i].start)*.45)));
+  const outFrames=parts.reduce((sum,p)=>sum+p.end-p.start,0)-fades.reduce((a,b)=>a+b,0);
+  const dataBytes=outFrames*ch*2;
+  if(dataBytes>0xffffffff-36)throw new Error('Wynik przekroczył limit klasycznego WAV (około 4 GB).');
+  const handle=await window.showSaveFilePicker({suggestedName:(sourceFile.name.replace(/\.[^.]+$/,'')||'mix')+'_mix.wav',types:[{description:'WAV audio',accept:{'audio/wav':['.wav']}}]});
+  savedMixHandle=handle;
+  writable=await handle.createWritable();
+  const header=new ArrayBuffer(44),v=new DataView(header);
+  const str=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  str(0,'RIFF');v.setUint32(4,36+dataBytes,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,sr,true);v.setUint32(28,sr*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,dataBytes,true);
+  await writable.write(new Uint8Array(header));
+  const chunkFrames=Math.max(4096,Math.floor(sr*2));
+  const readSamples=async(startFrame,count)=>{
+   const ab=await sourceFile.slice(info.offset+startFrame*frameBytes,info.offset+(startFrame+count)*frameBytes).arrayBuffer();
+   const view=new DataView(ab),out=Array.from({length:ch},()=>new Float32Array(count));
+   for(let i=0;i<count;i++)for(let c=0;c<ch;c++)out[c][i]=sampleAt(view,i*frameBytes+c*srcBytes,info.bits,info.format);
+   return out;
+  };
+  const writePcm16=async(channels,count)=>{
+   const ab=new ArrayBuffer(count*ch*2),view=new DataView(ab);let off=0;
+   for(let i=0;i<count;i++)for(let c=0;c<ch;c++){let x=Math.max(-1,Math.min(1,channels[c][i]));view.setInt16(off,x<0?x*32768:x*32767,true);off+=2;}
+   await writable.write(new Uint8Array(ab));
+  };
+  let completed=0;
+  // Keep only a short tail in memory so it can be crossfaded with the next segment.
+  let pendingTail=null, pendingCount=0;
   for(let pi=0;pi<parts.length;pi++){
-   const p=parts[pi], data=Array.from({length:ch},(_,c)=>audioBuffer.getChannelData(c).subarray(p.start,p.end));
-   if(pi>0){const prev=parts[pi-1];const overlap=Math.min(fadeFrames,Math.floor((prev.end-prev.start)*.45),Math.floor((p.end-p.start)*.45));const start=pos-overlap;
-    for(let c=0;c<ch;c++){const dst=out[c],src=data[c];for(let j=0;j<overlap;j++){const x=(j+1)/(overlap+1);dst[start+j]=dst[start+j]*Math.cos(x*Math.PI/2)+src[j]*Math.sin(x*Math.PI/2);}}
-    for(let c=0;c<ch;c++)out[c].set(data[c].subarray(overlap),start+overlap);
-    pos=start+(p.end-p.start);
-   }else{for(let c=0;c<ch;c++)out[c].set(data[c],pos);pos+=p.end-p.start;}
-   progress(10+80*(pi+1)/parts.length);
+   const p=parts[pi],len=p.end-p.start,fadeIn=pi>0?fades[pi-1]:0,fadeOut=pi<parts.length-1?fades[pi]:0;
+   let pos=0;
+   if(pi>0&&pendingTail&&fadeIn>0){
+    const head=await readSamples(p.start,fadeIn);
+    const mixed=Array.from({length:ch},(_,c)=>new Float32Array(fadeIn));
+    for(let i=0;i<fadeIn;i++){const x=(i+1)/(fadeIn+1);for(let c=0;c<ch;c++)mixed[c][i]=pendingTail[c][i]*Math.cos(x*Math.PI/2)+head[c][i]*Math.sin(x*Math.PI/2);}
+    await writePcm16(mixed,fadeIn);pos=fadeIn;completed+=fadeIn;
+   }else if(pi>0&&pendingTail){await writePcm16(pendingTail,pendingCount);completed+=pendingCount;pos=0;}
+   const bodyEnd=len-fadeOut;
+   while(pos<bodyEnd){
+    const n=Math.min(chunkFrames,bodyEnd-pos),chunk=await readSamples(p.start+pos,n);
+    await writePcm16(chunk,n);pos+=n;completed+=n;
+    progress(5+90*completed/outFrames);
+    status(`Zapisuję WAV etapami na dysk: ${Math.min(100,Math.round(100*completed/outFrames))}%`);
+   }
+   if(fadeOut>0){pendingTail=await readSamples(p.end-fadeOut,fadeOut);pendingCount=fadeOut;}
+   else {pendingTail=null;pendingCount=0;}
   }
-  // Write PCM16 WAV
-  const actualLen=pos, wav=encodeWav(out.map(a=>a.subarray(0,actualLen)),sr);mixBlob=new Blob([wav],{type:'audio/wav'});
-  const url=URL.createObjectURL(mixBlob);$('wavDownload').href=url;$('wavDownload').classList.remove('hidden');$('wavDownload').download=(sourceFile?.name.replace(/\.[^.]+$/,'')||'mix')+'_mix.wav';
-  $('exportBtn').disabled=false;status(`Gotowy miks: ${fmtTime(actualLen/sr)}. Możesz pobrać WAV albo wyeksportować MP4.`,'good');progress(100);
- }catch(err){status('Nie udało się utworzyć miksu: '+err.message,'warn');}
- $('mixBtn').disabled=false;
- },40);
+  if(pendingTail&&pendingCount){await writePcm16(pendingTail,pendingCount);completed+=pendingCount;}
+  await writable.close();writable=null;
+  status('Gotowe! Miks WAV został zapisany bezpośrednio na dysku.','good');progress(100);
+ }catch(err){
+  if(writable){try{await writable.abort();}catch(_){}}
+  console.error(err);status('Nie udało się zapisać WAV: '+(err.message||err),'warn');
+ }finally{$('mixBtn').disabled=!tracks.length;$('webmBtn').disabled=!tracks.length;$('exportBtn').disabled=true;}
 }
 function encodeWav(channels,sr){
  const ch=channels.length,n=channels[0].length,bytes=44+n*ch*2,buf=new ArrayBuffer(bytes),v=new DataView(buf);
@@ -156,40 +236,128 @@ function encodeWav(channels,sr){
  str(0,'RIFF');v.setUint32(4,bytes-8,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,sr,true);v.setUint32(28,sr*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,bytes-44,true);
  let o=44;for(let i=0;i<n;i++)for(let c=0;c<ch;c++){let s=Math.max(-1,Math.min(1,channels[c][i]));v.setInt16(o,s<0?s*32768:s*32767,true);o+=2;}return buf;
 }
-$('mixBtn').onclick=makeMix;
+$('mixBtn').onclick=exportLargeWav;
 async function loadFFmpeg(){
  if(ffmpegLoaded)return ffmpeg;
- status('Ładuję moduł eksportu MP4 z internetu (tylko przy pierwszym użyciu)…');progress(5);
- const {FFmpeg}=await import('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
- const {toBlobURL}=await import('https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js');
+ const timeout = (promise, ms, label) => Promise.race([
+   promise,
+   new Promise((_, reject) => setTimeout(() => reject(new Error(label+' — przekroczono limit czasu. Sprawdź połączenie lub spróbuj ponownie.')), ms))
+ ]);
+ status('Krok 1/4: pobieram bibliotekę eksportu…');progress(3);
+ const {FFmpeg}=await timeout(import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js'),30000,'Pobieranie biblioteki FFmpeg');
+ const {toBlobURL}=await timeout(import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js'),30000,'Pobieranie narzędzi FFmpeg');
  ffmpeg=new FFmpeg();
  ffmpeg.on('progress',({progress:p})=>progress(10+Math.max(0,Math.min(1,p))*85));
- ffmpeg.on('log',({message})=>{if(/error/i.test(message))console.warn(message);});
- const base='https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
- await ffmpeg.load({coreURL:await toBlobURL(base+'/ffmpeg-core.js','text/javascript'),wasmURL:await toBlobURL(base+'/ffmpeg-core.wasm','application/wasm')});
- ffmpegLoaded=true;return ffmpeg;
+ ffmpeg.on('log',({message})=>{console.info('[FFmpeg]',message);});
+ const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.12.6/dist/umd';
+ status('Krok 2/4: pobieram pliki silnika FFmpeg…');progress(8);
+ const [coreURL,wasmURL,workerURL] = await Promise.all([
+   timeout(toBlobURL(base+'/ffmpeg-core.js','text/javascript'),60000,'Pobieranie ffmpeg-core.js'),
+   timeout(toBlobURL(base+'/ffmpeg-core.wasm','application/wasm'),120000,'Pobieranie ffmpeg-core.wasm'),
+   timeout(toBlobURL('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/worker.js','text/javascript'),60000,'Pobieranie worker.js')
+ ]);
+ status('Krok 3/4: uruchamiam silnik FFmpeg… jeśli to pierwszy raz, może potrwać chwilę.');progress(12);
+ console.info('[MixLab] FFmpeg URLs prepared', {coreURL, wasmURL, workerURL});
+ const loadPromise = ffmpeg.load({classWorkerURL:workerURL,coreURL,wasmURL});
+ await timeout(loadPromise,120000,'Uruchamianie silnika FFmpeg nie powiodło się. Możliwy błąd ładowania WASM/Worker. Otwórz F12 → Console i skopiuj czerwony komunikat.');
+ ffmpegLoaded=true;
+ status('Krok 4/4: silnik gotowy. Przygotowuję eksport…','good');progress(15);
+ return ffmpeg;
 }
-$('exportBtn').onclick=async()=>{
- if(!mixBlob)return; $('exportBtn').disabled=true;$('mixBtn').disabled=true;clearDownloads();
+$('exportBtn').onclick=()=>status('Eksport MP4 nie jest dostępny w wersji przeglądarkowej. Użyj eksportu WebM — YouTube obsługuje ten format.','warn');
+$('webmBtn').onclick=async()=>{
+ if(!window.showOpenFilePicker||!window.showSaveFilePicker){
+  status('Eksport WebM bez dużego zużycia RAM wymaga aktualnego Chrome na komputerze (z obsługą wyboru pliku i zapisu strumieniowego).','warn');return;
+ }
+ let writable=null, recorder=null, audioCtx=null, mediaEl=null, objectUrl=null, stopPromise=null, frameTimer=null;
+ $('webmBtn').disabled=true;$('mixBtn').disabled=true;clearDownloads();progress(0);
  try{
-  const f=await loadFFmpeg();status('Przygotowuję pliki do eksportu MP4…');
-  const wavBytes=new Uint8Array(await mixBlob.arrayBuffer());await f.writeFile('mix.wav',wavBytes);
-  const quality=$('quality').value;
-  if(coverFile){
-   await f.writeFile('cover.'+((coverFile.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')),new Uint8Array(await coverFile.arrayBuffer()));
-   const ext=(coverFile.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
-   const coverName='cover.'+ext;
-   status('Koduję MP4 z okładką i dźwiękiem…');
-   await f.exec(['-loop','1','-framerate','2','-i',coverName,'-i','mix.wav','-map','0:v:0','-map','1:a:0','-c:v','libx264','-preset','ultrafast','-tune','stillimage','-pix_fmt','yuv420p','-vf',$('coverOnly').checked?'scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2':'scale=1280:720','-c:a','aac','-b:a',quality,'-shortest','-movflags','+faststart','mix.mp4']);
-  }else{
-   status('Koduję MP4 z czarnym tłem i dźwiękiem…');
-   await f.exec(['-f','lavfi','-i','color=c=black:s=1280x720:r=2','-i','mix.wav','-map','0:v:0','-map','1:a:0','-c:v','libx264','-preset','ultrafast','-tune','stillimage','-pix_fmt','yuv420p','-c:a','aac','-b:a',quality,'-shortest','-movflags','+faststart','mix.mp4']);
+  if(!savedMixHandle){
+   status('Najpierw kliknij „Zapisz miks WAV na dysk”. Eksport WebM użyje wtedy właśnie tego pliku, bez ponownego wybierania go.','warn');
+   return;
   }
-  const data=await f.readFile('mix.mp4');const blob=new Blob([data.buffer.slice(data.byteOffset,data.byteOffset+data.byteLength)],{type:'video/mp4'});const url=URL.createObjectURL(blob);
-  $('mp4Download').href=url;$('mp4Download').download=(sourceFile?.name.replace(/\.[^.]+$/,'')||'mix')+'.mp4';$('mp4Download').classList.remove('hidden');
-  status(`Gotowe! MP4 ma ${ (blob.size/1024/1024).toLocaleString('pl-PL',{maximumFractionDigits:1}) } MB. Kliknij „Pobierz gotowy MP4”.`,'good');progress(100);
- }catch(err){console.error(err);status('Eksport MP4 nie powiódł się. Sprawdź połączenie z internetem i wolną pamięć RAM. Szczegóły: '+(err.message||err),'warn');}
- $('exportBtn').disabled=!mixBlob;$('mixBtn').disabled=!tracks.length;
+  const file=await savedMixHandle.getFile();
+  if(!file.size)throw new Error('Zapisany miks WAV ma 0 bajtów. Najpierw utwórz go ponownie.');
+  const info=await readWavInfo(file);
+  if(info.duration<1)throw new Error('Plik WAV jest za krótki.');
+  const saveHandle=await window.showSaveFilePicker({suggestedName:file.name.replace(/\.[^.]+$/,'')+'.webm',types:[{description:'WebM video',accept:{'video/webm':['.webm']}}]});
+  writable=await saveHandle.createWritable();
+  const canvas=document.createElement('canvas');canvas.width=1280;canvas.height=720;
+  const ctx=canvas.getContext('2d');
+  let img=null;
+  if(coverFile){
+   img=new Image();const imageUrl=URL.createObjectURL(coverFile);
+   await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('Nie można wczytać okładki.'));img.src=imageUrl;});
+   URL.revokeObjectURL(imageUrl);
+  }
+  const draw=()=>{
+   ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);
+   if(img){
+    const fit=$('coverOnly').checked;
+    if(fit){const scale=Math.min(canvas.width/img.width,canvas.height/img.height),w=img.width*scale,h=img.height*scale;ctx.drawImage(img,(canvas.width-w)/2,(canvas.height-h)/2,w,h);}
+    else ctx.drawImage(img,0,0,canvas.width,canvas.height);
+   }
+  };
+  draw();
+  const videoStream=canvas.captureStream(2);
+  const videoTrack=videoStream.getVideoTracks()[0];
+  frameTimer=setInterval(()=>{draw();if(videoTrack&&videoTrack.requestFrame)videoTrack.requestFrame();},500);
+  mediaEl=document.createElement('audio');mediaEl.preload='auto';mediaEl.src=URL.createObjectURL(file);objectUrl=mediaEl.src;
+  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  const source=audioCtx.createMediaElementSource(mediaEl),dest=audioCtx.createMediaStreamDestination();
+  source.connect(dest); // audio goes to recorder; don't play to speakers
+  const stream=new MediaStream([...videoStream.getVideoTracks(),...dest.stream.getAudioTracks()]);
+  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')?'video/webm;codecs=vp9,opus':
+             MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')?'video/webm;codecs=vp8,opus':'video/webm';
+  recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:1200000,audioBitsPerSecond:192000});
+  let writeChain=Promise.resolve(), written=0;
+  recorder.ondataavailable=e=>{
+   if(e.data&&e.data.size){written+=e.data.size;writeChain=writeChain.then(()=>e.data.arrayBuffer()).then(buf=>writable.write(new Uint8Array(buf)));}
+  };
+  const ended=new Promise((resolve,reject)=>{
+   recorder.onstop=()=>resolve();
+   recorder.onerror=e=>reject(e.error||new Error('Błąd MediaRecorder.'));
+  });
+  recorder.start(1000);
+  status('Nagrywam WebM w czasie rzeczywistym. To trwa mniej więcej tyle, ile wynosi długość miksu: '+fmtTime(info.duration)+'. Nie zamykaj tej karty.','warn');
+  await audioCtx.resume();
+  await new Promise((resolve,reject)=>{
+   let settled=false, timer=null;
+   const finish=()=>{if(!settled){settled=true;if(timer)clearInterval(timer);resolve();}};
+   mediaEl.onended=finish;
+   mediaEl.onerror=()=>{if(!settled){settled=true;if(timer)clearInterval(timer);reject(new Error('Nie udało się odtworzyć wybranego WAV.'));}};
+   const began=Date.now();
+   timer=setInterval(()=>{
+    const p=Math.min(99,mediaEl.currentTime/info.duration*100);progress(p);
+    status(`Tworzę WebM: ${Math.floor(p)}% · ${fmtTime(mediaEl.currentTime)} / ${fmtTime(info.duration)}. Plik zapisuje się etapami na dysk.`);
+    if(mediaEl.ended || mediaEl.currentTime>=info.duration-0.15)finish();
+    if(Date.now()-began>(info.duration+120)*1000 && !settled){settled=true;if(timer)clearInterval(timer);reject(new Error('Przekroczono limit czasu nagrywania.'));}
+   },250);
+   mediaEl.play().catch(err=>{if(!settled){settled=true;if(timer)clearInterval(timer);reject(err);}});
+  });
+  status('Kończę zapis WebM i zapisuję ostatnią porcję danych…','warn');
+  if(recorder.state!=='inactive'){
+   try{recorder.requestData();}catch(_){}
+   recorder.stop();
+  }
+  await Promise.race([ended,new Promise((_,reject)=>setTimeout(()=>reject(new Error('Nagrywarka nie zakończyła pracy po zatrzymaniu. Spróbuj ponownie w Chrome.')),15000))]);
+  await writeChain;
+  clearInterval(frameTimer);
+  if(written===0)throw new Error('Nagrywarka nie przekazała żadnych danych — nie zapisano poprawnego WebM. Spróbuj ponownie; jeśli błąd się powtórzy, sprawdzimy obsługę kodeka w Chrome.');
+  await writable.close();writable=null;
+  status(`Gotowe! WebM zapisany na dysku (${(written/1024/1024).toLocaleString('pl-PL',{maximumFractionDigits:1})} MB). Możesz przesłać go bezpośrednio do YouTube.`,'good');progress(100);
+  stream.getTracks().forEach(t=>t.stop());
+ }catch(err){
+  if(frameTimer)clearInterval(frameTimer);
+  console.error(err);if(recorder&&recorder.state!=='inactive'){try{recorder.stop();}catch(_){}}
+  if(writable){try{await writable.abort();}catch(_){}}
+  status('Eksport WebM nie powiódł się: '+(err.message||err),'warn');
+ }finally{
+  if(mediaEl){mediaEl.pause();mediaEl.removeAttribute('src');}
+  if(objectUrl)URL.revokeObjectURL(objectUrl);
+  if(audioCtx){try{await audioCtx.close();}catch(_){}}
+  $('webmBtn').disabled=!tracks.length;$('mixBtn').disabled=!tracks.length;
+ }
 };
 reset();
 })();
