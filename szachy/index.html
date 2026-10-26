@@ -30,7 +30,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <script>
 (()=>{const $=x=>document.getElementById(x),board=$('board'),ctx=board.getContext('2d'),out=$('out'),oc=out.getContext('2d'),files='abcdefgh',glyph={wk:'♔',wq:'♕',wr:'♖',wb:'♗',wn:'♘',wp:'♙',bk:'♚',bq:'♛',br:'♜',bb:'♝',bn:'♞',bp:'♟'};
-function drawPiece(c,k,cx,cy,size){const white=k[0]==='w',type=k[1],fill=white?'#fffef8':'#17191b',stroke=white?'#252820':'#f0eee5',lw=size*.055; c.save();c.translate(cx-size*.36,cy-size*.39);c.scale(size*.72,size*.78);c.lineWidth=lw/size/.72;c.lineJoin='round';c.lineCap='round';c.fillStyle=fill;c.strokeStyle=stroke;const path=(d)=>{let p=new Path2D(d);c.fill(p);c.stroke(p)};if(type==='p'){path('M50 10 C37 10 30 20 32 31 C33 39 39 43 43 45 L32 70 L22 82 L18 91 L82 91 L78 82 L68 70 L57 45 C64 40 69 34 68 26 C67 17 60 10 50 10 Z')}else if(type==='r'){path('M23 12 L39 12 L39 25 L48 25 L48 12 L62 12 L62 25 L76 25 L72 68 L81 82 L84 91 L16 91 L19 82 L28 68 Z')}else if(type==='b'){path('M50 8 C39 18 35 26 42 35 C45 39 49 41 50 42 C42 48 38 57 35 69 L25 81 L18 91 L82 91 L75 81 L65 69 C62 57 58 48 50 42 C62 34 64 23 50 8 Z');c.beginPath();c.moveTo(42,24);c.lineTo(58,52);c.stroke()}else if(type==='q'){path('M18 27 L29 49 L34 33 L43 49 L50 18 L58 49 L68 33 L73 49 L83 27 L75 70 L83 82 L86 91 L14 91 L17 82 L25 70 Z');for(const [x,y] of [[18,20],[34,25],[50,10],[67,25],[83,20]]){c.beginPath();c.arc(x,y,5,0,Math.PI*2);c.fill();c.stroke()}}else if(type==='k'){path('M43 8 L57 8 L57 25 L72 25 L72 38 L57 38 L57 49 C62 55 66 62 68 71 L80 82 L84 91 L16 91 L20 82 L32 71 C34 62 38 55 43 49 L43 38 L28 38 L28 25 L43 25 Z')}else if(type==='n'){path('M20 88 L20 77 L29 65 L26 50 L31 35 L44 19 L63 11 L78 18 L73 31 L83 42 L76 52 L62 51 L57 63 L69 75 L81 83 L84 91 L16 91 Z');c.beginPath();c.arc(62,27,2.6,0,Math.PI*2);c.fillStyle=white?'#252820':'#f0eee5';c.fill()}c.restore()}
+function drawPiece(c,k,cx,cy,size){
+ const white=k[0]==='w',glyphs={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'},glyph=glyphs[k[1]];
+ c.save();
+ // Chess symbols are rendered as typographic Staunton-style pieces, with a soft
+ // fill, a strong outline and a subtle offset shadow like the reference image.
+ c.textAlign='center';c.textBaseline='middle';
+ const fontSize=size*1.03;
+ c.font=`${fontSize}px "DejaVu Sans","Arial Unicode MS","Segoe UI Symbol",serif`;
+ c.lineJoin='round';c.lineCap='round';
+ c.shadowColor=white?'rgba(0,0,0,.32)':'rgba(255,255,255,.12)';
+ c.shadowBlur=size*.025;c.shadowOffsetX=size*.012;c.shadowOffsetY=size*.018;
+ c.lineWidth=size*.045;c.strokeStyle=white?'#393939':'#292929';
+ c.fillStyle=white?'#fffef8':'#666464';
+ c.strokeText(glyph,cx,cy+size*.015);
+ c.fillText(glyph,cx,cy+size*.015);
+ c.shadowColor='transparent';c.shadowBlur=0;c.shadowOffsetX=0;c.shadowOffsetY=0;
+ // Small highlight gives the pieces the slightly dimensional look of the sample.
+ c.lineWidth=size*.012;c.strokeStyle=white?'rgba(255,255,255,.65)':'rgba(210,210,210,.22)';
+ c.strokeText(glyph,cx-size*.006,cy+size*.005);
+ c.restore()
+}
 const themes={green:['#eeeed2','#779556'],blue:['#e8edf3','#7392b8'],brown:['#f0d9b5','#b58863']};let fens=[],san=[],idx=0,timer=null,playing=false,musicFile=null,musicUrl=null;
 const example='[Event "Casual Game"]\\n[White "Player 1"]\\n[Black "Player 2"]\\n\\n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O *';
 function loadPgn(t){if(!window.Chess)throw Error('Nie udało się załadować biblioteki szachowej. Sprawdź internet i odśwież stronę.');let g=new Chess();if(!g.load_pgn(t,{sloppy:true}))throw Error('Nie udało się odczytać PGN. Sprawdź poprawność pliku.');let hist=g.history({verbose:true}),r=new Chess();fens=[r.fen()];san=[];for(const m of hist){san.push(m.san);r.move(m);fens.push(r.fen())}idx=0;stop();renderMoves();draw();ui();$('status').textContent=`Wczytano partię: ${san.length} półruchów.`}
