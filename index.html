@@ -8,25 +8,27 @@
 :root{color-scheme:dark;--bg:#0d1017;--panel:#151a25;--panel2:#1c2331;--line:#30394b;--text:#f3f5fa;--muted:#a4aec0;--accent:#8b7cff;--accent2:#b5adff;--good:#72d6a1;--warn:#ffd17a}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1a2040 0,#0d1017 48%);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 main{max-width:1080px;margin:0 auto;padding:28px 18px 60px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.eyebrow{color:var(--accent2);font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}h1{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:8px 0 10px;letter-spacing:-.04em}.sub{color:var(--muted);max-width:680px;margin:0}.pill{border:1px solid #45406f;color:#d4ceff;background:#242044;border-radius:99px;padding:8px 12px;font-size:12px;white-space:nowrap}
-.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.panel{background:linear-gradient(180deg,rgba(25,31,45,.97),rgba(19,24,35,.97));border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 12px 35px #0002}.panel h2{font-size:17px;margin:0 0 14px}.upload{display:block;border:1px dashed #5a6380;border-radius:14px;padding:25px 18px;text-align:center;background:#111622;cursor:pointer;transition:.2s}.upload:hover{border-color:var(--accent);background:#17182b}.upload input{display:none}.upload .big{font-size:28px}.upload strong{display:block;margin:8px 0 4px}.muted{color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 8px}.row label{font-weight:650}.field{margin:16px 0}.field input[type=range]{width:100%;accent-color:var(--accent)}input[type=number],select{background:#101521;color:var(--text);border:1px solid var(--line);padding:9px;border-radius:9px}.btn{border:1px solid var(--line);background:#222a3a;color:var(--text);padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;transition:.15s}.btn:hover{filter:brightness(1.16)}.btn:disabled{opacity:.4;cursor:not-allowed}.primary{background:linear-gradient(135deg,#8b7cff,#6555dc);border-color:transparent;color:white}.btn.small{padding:5px 9px;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.tracklist{display:flex;flex-direction:column;gap:8px;margin-top:14px}.track{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#111622}.num{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#292448;color:#c9c2ff;font-weight:800;font-size:12px}.trackname{font-weight:650;overflow-wrap:anywhere}.trackmeta{color:var(--muted);font-size:12px}.trackcontrols{display:flex;gap:5px}.status{margin-top:14px;border-radius:10px;padding:11px 13px;background:#111622;color:var(--muted);font-size:13px;min-height:42px}.status.good{color:var(--good)}.status.warn{color:var(--warn)}.progress{height:5px;border-radius:9px;background:#30384a;overflow:hidden;margin-top:9px}.progress>div{height:100%;width:0;background:linear-gradient(90deg,#8b7cff,#71d6ff);transition:width .2s}.preview{width:100%;max-height:180px;object-fit:contain;border-radius:10px;background:#0c1018;margin-top:10px;display:none}.check{display:flex;gap:9px;align-items:center;color:var(--muted);font-size:13px}.check input{accent-color:var(--accent)}.footer{margin-top:18px;color:var(--muted);font-size:12px}.tag{font-size:11px;color:#c7c1ff;background:#282344;border-radius:6px;padding:3px 6px}.empty{padding:18px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);font-size:13px}.full{grid-column:1/-1}.hidden{display:none!important}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.panel{background:linear-gradient(180deg,rgba(25,31,45,.97),rgba(19,24,35,.97));border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 12px 35px #0002}.panel h2{font-size:17px;margin:0 0 14px}.upload{display:block;border:1px dashed #5a6380;border-radius:14px;padding:25px 18px;text-align:center;background:#111622;cursor:pointer;transition:.2s}.upload:hover{border-color:var(--accent);background:#17182b}.upload input{display:none}.upload .big{font-size:28px}.upload strong{display:block;margin:8px 0 4px}.muted{color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 8px}.row label{font-weight:650}.field{margin:16px 0}.field input[type=range]{width:100%;accent-color:var(--accent)}input[type=number],select{background:#101521;color:var(--text);border:1px solid var(--line);padding:9px;border-radius:9px}.btn{border:1px solid var(--line);background:#222a3a;color:var(--text);padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;transition:.15s}.btn:hover{filter:brightness(1.16)}.btn:disabled{opacity:.4;cursor:not-allowed}.primary{background:linear-gradient(135deg,#8b7cff,#6555dc);border-color:transparent;color:white}.btn.small{padding:5px 9px;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.tracklist{display:flex;flex-direction:column;gap:8px;margin-top:14px}.track{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#111622;cursor:grab}.track.dragging{opacity:.45;border-color:var(--accent)}.track.drag-over{border-color:var(--accent);background:#19182c}.source-badge{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:6px;background:#292448;color:#d4ceff;font-size:10px;font-weight:800;vertical-align:middle}.num{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#292448;color:#c9c2ff;font-weight:800;font-size:12px}.trackname{font-weight:650;overflow-wrap:anywhere}.trackmeta{color:var(--muted);font-size:12px}.trackcontrols{display:flex;gap:5px}.status{margin-top:14px;border-radius:10px;padding:11px 13px;background:#111622;color:var(--muted);font-size:13px;min-height:42px}.status.good{color:var(--good)}.status.warn{color:var(--warn)}.progress{height:5px;border-radius:9px;background:#30384a;overflow:hidden;margin-top:9px}.progress>div{height:100%;width:0;background:linear-gradient(90deg,#8b7cff,#71d6ff);transition:width .2s}.preview{width:100%;max-height:180px;object-fit:contain;border-radius:10px;background:#0c1018;margin-top:10px;display:none}.check{display:flex;gap:9px;align-items:center;color:var(--muted);font-size:13px}.check input{accent-color:var(--accent)}.footer{margin-top:18px;color:var(--muted);font-size:12px}.tag{font-size:11px;color:#c7c1ff;background:#282344;border-radius:6px;padding:3px 6px}.empty{padding:18px;border:1px dashed var(--line);border-radius:12px;text-align:center;color:var(--muted);font-size:13px}.full{grid-column:1/-1}.hidden{display:none!important}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column}.pill{white-space:normal}.panel{padding:16px}}
 </style>
 </head>
 <body>
 <main>
 <header class="hero">
-  <div><div class="eyebrow">Audio workspace · local processing</div><h1>MixLab <span style="color:#a69cff">WAV → MP4</span></h1><p class="sub">Wczytaj WAV i wykrywaj utwory etapami. Zapisz miks WAV na dysk, a potem wybierz go w eksporcie WebM. WebM jest zapisywany porcjami na dysk i można go przesłać do YouTube. Nagrywanie trwa w czasie rzeczywistym.</p></div>
+  <div><div class="eyebrow">Audio workspace · local processing</div><h1>MixLab <span style="color:#a69cff">WAV → MP4</span></h1><p class="sub">Wczytaj do trzech plików WAV i wykrywaj utwory etapami. Ułóż fragmenty myszką, zapisz miks WAV na dysk, a potem wybierz go w eksporcie WebM. WebM jest zapisywany porcjami na dysk i można go przesłać do YouTube. Nagrywanie trwa w czasie rzeczywistym.</p></div>
   <div class="pill">🔒 Plik audio pozostaje na Twoim komputerze</div>
 </header>
 <div class="grid">
 <section class="panel">
-  <h2>01 / Plik źródłowy</h2>
-  <label class="upload" for="audioFile"><span class="big">🎵</span><strong>Wybierz plik WAV</strong><span class="muted">Kliknij lub przeciągnij plik tutaj · zalecany Chrome na komputerze</span><input id="audioFile" type="file" accept=".wav,audio/wav,audio/*"></label>
-  <div class="row"><span id="fileName" class="muted">Nie wybrano pliku</span><span id="duration" class="tag">—</span></div>
+  <h2>01 / Pliki źródłowe</h2>
+  <p class="muted">Wybierz od 1 do 3 plików WAV. Utwory z każdego pliku zostaną oznaczone numerem źródła. Aby połączyć je w jeden miks, pliki muszą mieć tę samą częstotliwość próbkowania i taką samą liczbę kanałów (mono/stereo).</p>
+  <div class="field"><label class="upload" for="audioFile1"><span class="big">🎵</span><strong>Wybierz plik WAV nr 1</strong><span class="muted">Kliknij, aby wybrać pierwszy plik</span><input id="audioFile1" type="file" accept=".wav,audio/wav,audio/*"></label><div class="row"><span id="fileName1" class="muted">Nie wybrano pliku</span><span id="duration1" class="tag">—</span></div></div>
+  <div class="field"><label class="upload" for="audioFile2" style="padding:18px"><strong>＋ Wybierz plik WAV nr 2</strong><span class="muted">Opcjonalnie</span><input id="audioFile2" type="file" accept=".wav,audio/wav,audio/*"></label><div class="row"><span id="fileName2" class="muted">Nie wybrano pliku</span><span id="duration2" class="tag">—</span></div></div>
+  <div class="field"><label class="upload" for="audioFile3" style="padding:18px"><strong>＋ Wybierz plik WAV nr 3</strong><span class="muted">Opcjonalnie</span><input id="audioFile3" type="file" accept=".wav,audio/wav,audio/*"></label><div class="row"><span id="fileName3" class="muted">Nie wybrano pliku</span><span id="duration3" class="tag">—</span></div></div>
   <div class="field"><div class="row"><label for="threshold">Próg ciszy</label><strong id="thresholdLabel">−42 dB</strong></div><input id="threshold" type="range" min="-60" max="-20" value="-42" step="1"><div class="muted">Niższy próg wykrywa tylko głębszą ciszę. Jeśli utwory są ściśnięte bez pełnej ciszy, spróbuj −35 dB.</div></div>
   <div class="field"><div class="row"><label for="minSilence">Minimalna długość ciszy</label><strong><span id="silenceLabel">1,2</span> s</strong></div><input id="minSilence" type="range" min="0.3" max="4" value="1.2" step="0.1"></div>
   <div class="field"><div class="row"><label for="trim">Zapas przy cięciu</label><strong><span id="trimLabel">0,15</span> s</strong></div><input id="trim" type="range" min="0" max="0.8" value="0.15" step="0.05"><div class="muted">Zostawia mały margines przed/po wykrytej ciszy, żeby nie ucinać końcówek.</div></div>
-  <div class="actions"><button id="detectBtn" class="btn primary" disabled>Wykryj utwory</button><button id="resetBtn" class="btn" disabled>Wyczyść</button></div>
+  <div class="actions"><button id="detectBtn" class="btn primary" disabled>Wykryj utwory ze wszystkich plików</button><button id="resetBtn" class="btn" disabled>Wyczyść wszystko</button></div>
 </section>
 <section class="panel">
   <h2>02 / Ustawienia miksu</h2>
@@ -38,7 +40,7 @@ main{max-width:1080px;margin:0 auto;padding:28px 18px 60px}.hero{display:flex;ju
 </section>
 <section class="panel full">
   <div class="row"><h2 style="margin:0">03 / Wykryte utwory</h2><span id="trackCount" class="tag">0 utworów</span></div>
-  <p class="muted">Po wykryciu możesz przesuwać utwory w górę/dół albo usuwać fałszywe podziały. Lista określa kolejność ręczną.</p>
+  <p class="muted">Przeciągaj utwory myszką, aby zmieniać kolejność. Przycisk × usuwa wybrany fragment. Oznaczenie WAV 1/2/3 wskazuje plik źródłowy.</p>
   <div id="tracks" class="tracklist"><div class="empty">Najpierw wybierz plik WAV i kliknij „Wykryj utwory”.</div></div>
   <div id="status" class="status">Gotowy. Wszystkie obliczenia audio odbywają się w tej karcie przeglądarki.</div><div class="progress"><div id="progressBar"></div></div>
   <div class="actions"><a id="wavDownload" class="btn hidden" download="mix.wav">Pobierz miks WAV</a><a id="mp4Download" class="btn primary hidden" download="mix.mp4">Pobierz gotowy MP4</a></div>
@@ -49,20 +51,23 @@ main{max-width:1080px;margin:0 auto;padding:28px 18px 60px}.hero{display:flex;ju
 <script>
 (() => {
 const $ = id => document.getElementById(id);
-let audioBuffer=null, sourceFile=null, tracks=[], coverFile=null, mixBlob=null, ffmpeg=null, ffmpegLoaded=false, savedMixHandle=null;
+let audioBuffer=null, sourceFile=null, sourceFiles=[null,null,null], sourceInfos=[null,null,null], tracks=[], coverFile=null, mixBlob=null, ffmpeg=null, ffmpegLoaded=false, savedMixHandle=null;
 const fmtTime = s => {s=Math.max(0,s);const m=Math.floor(s/60),sec=(s%60).toFixed(1).padStart(4,'0');return `${m}:${sec}`};
 const fmtNum = n => Number(n).toLocaleString('pl-PL',{minimumFractionDigits:1,maximumFractionDigits:2});
 function status(msg,kind=''){ $('status').textContent=msg;$('status').className='status '+kind; }
 function progress(v){$('progressBar').style.width=Math.max(0,Math.min(100,v))+'%';}
 function clearDownloads(){ $('wavDownload').classList.add('hidden');$('mp4Download').classList.add('hidden'); }
-function reset(){audioBuffer=null;sourceFile=null;tracks=[];coverFile=null;mixBlob=null;savedMixHandle=null;$('fileName').textContent='Nie wybrano pliku';$('duration').textContent='—';$('detectBtn').disabled=true;$('resetBtn').disabled=true;$('mixBtn').disabled=true;$('exportBtn').disabled=true;$('tracks').innerHTML='<div class="empty">Najpierw wybierz plik WAV i kliknij „Wykryj utwory”.</div>';$('trackCount').textContent='0 utworów';$('coverPreview').style.display='none';clearDownloads();progress(0);status('Gotowy. Wszystkie obliczenia audio odbywają się w tej karcie przeglądarki.');}
-$('audioFile').addEventListener('change', async e=>{
- const f=e.target.files[0]; if(!f)return; reset(); sourceFile=f;
- $('fileName').textContent=f.name;$('duration').textContent='analiza przy wykrywaniu';
- $('detectBtn').disabled=false;$('resetBtn').disabled=false;
- status(`Wybrano ${(f.size/1024/1024).toLocaleString('pl-PL',{maximumFractionDigits:0})} MB. Nie wczytuję całego pliku do pamięci na tym etapie.`,'good');
-});
-$('resetBtn').onclick=()=>{ $('audioFile').value='';reset(); };
+function invalidateMix(){savedMixHandle=null;mixBlob=null;clearDownloads();$('webmBtn').disabled=true;}
+function reset(){audioBuffer=null;sourceFile=null;sourceFiles=[null,null,null];sourceInfos=[null,null,null];tracks=[];coverFile=null;mixBlob=null;savedMixHandle=null;for(let i=1;i<=3;i++){const el=$('audioFile'+i);if(el)el.value='';$('fileName'+i).textContent='Nie wybrano pliku';$('duration'+i).textContent='—';} $('detectBtn').disabled=true;$('resetBtn').disabled=true;$('mixBtn').disabled=true;$('webmBtn').disabled=true;$('exportBtn').disabled=true;$('tracks').innerHTML='<div class="empty">Najpierw wybierz co najmniej jeden plik WAV i kliknij „Wykryj utwory”.</div>';$('trackCount').textContent='0 utworów';$('coverPreview').style.display='none';$('coverFile').value='';clearDownloads();progress(0);status('Gotowy. Wszystkie obliczenia audio odbywają się w tej karcie przeglądarki.');}
+for(let i=0;i<3;i++){
+ $('audioFile'+(i+1)).addEventListener('change',e=>{
+  const f=e.target.files[0]||null;sourceFiles[i]=f;sourceInfos[i]=null;invalidateMix();tracks=tracks.filter(t=>t.sourceIndex!==i);
+  $('fileName'+(i+1)).textContent=f?f.name:'Nie wybrano pliku';$('duration'+(i+1)).textContent=f?'do analizy':'—';
+  $('detectBtn').disabled=!sourceFiles.some(Boolean);$('resetBtn').disabled=!sourceFiles.some(Boolean);$('mixBtn').disabled=true;$('webmBtn').disabled=true;
+  renderTracks();status(f?`Wybrano plik ${i+1}: ${f.name}. Kliknij „Wykryj utwory ze wszystkich plików”, aby zaktualizować listę.`:'Usunięto plik '+(i+1)+'.');
+ });
+}
+$('resetBtn').onclick=reset;
 $('threshold').oninput=()=> $('thresholdLabel').textContent='−'+Math.abs(+$('threshold').value)+' dB';
 $('minSilence').oninput=()=> $('silenceLabel').textContent=fmtNum(+$('minSilence').value);
 $('trim').oninput=()=> $('trimLabel').textContent=fmtNum(+$('trim').value);
@@ -97,138 +102,71 @@ function sampleAt(view,offset,bits,format){
  throw new Error('Nieobsługiwany format próbek.');
 }
 async function detectTracks(){
- if(!sourceFile)return; $('detectBtn').disabled=true;progress(0);
+ const selected=sourceFiles.map((file,index)=>({file,index})).filter(x=>x.file);if(!selected.length)return;
+ $('detectBtn').disabled=true;$('mixBtn').disabled=true;$('webmBtn').disabled=true;tracks=[];sourceInfos=[null,null,null];invalidateMix();progress(0);
  try{
-  status('Odczytuję nagłówek WAV bez ładowania całego pliku…');
-  const info=await readWavInfo(sourceFile), threshold=Math.pow(10,(+$('threshold').value)/20), minSilence=+$('minSilence').value, trim=+$('trim').value;
-  const frameBytes=info.blockAlign, sampleBytes=info.bits/8, framesPerChunk=Math.max(4096,Math.floor(info.sampleRate*.5));
-  const gaps=[];let quietStart=-1, frame=0;const hop=Math.max(1,Math.floor(info.sampleRate*.05));
-  while(frame<info.frames){
-   const n=Math.min(framesPerChunk,info.frames-frame), byteStart=info.offset+frame*frameBytes, byteEnd=byteStart+n*frameBytes;
-   const buf=await sourceFile.slice(byteStart,byteEnd).arrayBuffer(), view=new DataView(buf);
-   for(let local=0;local<n;local+=hop){
-    const end=Math.min(n,local+hop);let sum=0,count=0;
-    for(let j=local;j<end;j+=4){
-     for(let c=0;c<info.channels;c++){const val=sampleAt(view,j*frameBytes+c*sampleBytes,info.bits,info.format);sum+=val*val;count++;}
-    }
-    const rms=Math.sqrt(sum/Math.max(1,count)), t=(frame+local)/info.sampleRate;
-    if(rms<threshold){if(quietStart<0)quietStart=t;}
-    else if(quietStart>=0){const qEnd=t;if(qEnd-quietStart>=minSilence)gaps.push({start:quietStart,end:qEnd});quietStart=-1;}
+  const threshold=Math.pow(10,(+$('threshold').value)/20),minSilence=+$('minSilence').value,trim=+$('trim').value;
+  for(let si=0;si<selected.length;si++){
+   const {file,index}=selected[si];status(`Analizuję plik ${index+1}/3: ${file.name}`);const info=await readWavInfo(file);sourceInfos[index]=info;
+   const frameBytes=info.blockAlign,sampleBytes=info.bits/8,framesPerChunk=Math.max(4096,Math.floor(info.sampleRate*.5));const gaps=[];let quietStart=-1,frame=0;const hop=Math.max(1,Math.floor(info.sampleRate*.05));
+   while(frame<info.frames){
+    const n=Math.min(framesPerChunk,info.frames-frame),byteStart=info.offset+frame*frameBytes,byteEnd=byteStart+n*frameBytes;const buf=await file.slice(byteStart,byteEnd).arrayBuffer(),view=new DataView(buf);
+    for(let local=0;local<n;local+=hop){const end=Math.min(n,local+hop);let sum=0,count=0;for(let j=local;j<end;j+=4){for(let c=0;c<info.channels;c++){const val=sampleAt(view,j*frameBytes+c*sampleBytes,info.bits,info.format);sum+=val*val;count++;}}const rms=Math.sqrt(sum/Math.max(1,count)),t=(frame+local)/info.sampleRate;if(rms<threshold){if(quietStart<0)quietStart=t;}else if(quietStart>=0){const qEnd=t;if(qEnd-quietStart>=minSilence)gaps.push({start:quietStart,end:qEnd});quietStart=-1;}}
+    frame+=n;progress(100*(si+frame/info.frames)/selected.length);status(`Analiza WAV ${index+1}: ${Math.round(100*frame/info.frames)}% · ${fmtTime(frame/info.sampleRate)} / ${fmtTime(info.duration)}`);await new Promise(r=>setTimeout(r,0));
    }
-   frame+=n;progress(5+85*frame/info.frames);
-   status(`Analiza pliku etapami: ${Math.round(100*frame/info.frames)}% · ${fmtTime(frame/info.sampleRate)} / ${fmtTime(info.duration)}`);
-   await new Promise(r=>setTimeout(r,0));
+   if(quietStart>=0&&info.duration-quietStart>=minSilence)gaps.push({start:quietStart,end:info.duration});const bounds=[0];for(const g of gaps){const cut=(g.start+g.end)/2;if(cut>bounds[bounds.length-1]+1)bounds.push(cut);}bounds.push(info.duration);let found=[];
+   for(let j=0;j<bounds.length-1;j++){let start=bounds[j],end=bounds[j+1];if(j>0)start=Math.max(start,(gaps[j-1]?.end??start)-trim);if(j<gaps.length)end=Math.min(end,(gaps[j]?.start??end)+trim);if(end-start>=1)found.push({id:crypto.randomUUID(),sourceIndex:index,sourceName:file.name,start:Math.max(0,start),end:Math.min(info.duration,end),label:`Plik ${index+1} — Utwór ${String(found.length+1).padStart(2,'0')}`});}
+   if(!found.length)found=[{id:crypto.randomUUID(),sourceIndex:index,sourceName:file.name,start:0,end:info.duration,label:`Plik ${index+1} — Całe nagranie`}];tracks.push(...found);$('duration'+(index+1)).textContent=fmtTime(info.duration);
   }
-  if(quietStart>=0&&info.duration-quietStart>=minSilence)gaps.push({start:quietStart,end:info.duration});
-  const bounds=[0];for(const g of gaps){const cut=(g.start+g.end)/2;if(cut>bounds[bounds.length-1]+1)bounds.push(cut);}bounds.push(info.duration);
-  let found=[];
-  for(let i=0;i<bounds.length-1;i++){
-   let start=bounds[i],end=bounds[i+1];
-   if(i>0)start=Math.max(start,(gaps[i-1]?.end??start)-trim);
-   if(i<gaps.length)end=Math.min(end,(gaps[i]?.start??end)+trim);
-   if(end-start>=1)found.push({id:crypto.randomUUID(),start:Math.max(0,start),end:Math.min(info.duration,end),label:`Utwór ${found.length+1}`});
-  }
-  if(!found.length)found=[{id:crypto.randomUUID(),start:0,end:info.duration,label:'Całe nagranie'}];
-  tracks=found;
-  // Metadata-only buffer placeholder; WAV mix/export from browser requires decoding, so disable those controls with honest guidance.
-  audioBuffer=null;
-  renderTracks();
-  $('duration').textContent=fmtTime(info.duration);
-  $('mixBtn').disabled=false;$('exportBtn').disabled=true;
-  status(`Wykryto ${tracks.length} fragment(ów). Możesz teraz kliknąć „Zapisz miks WAV na dysk”. Zapis odbywa się etapami, bez trzymania całego wyniku w RAM-ie.`,'good');
-  progress(100);
- }catch(err){console.error(err);status('Nie udało się analizować WAV etapami: '+err.message,'warn');}
- $('detectBtn').disabled=false;
+  renderTracks();$('mixBtn').disabled=!tracks.length;$('webmBtn').disabled=true;$('duration1').title='Czas pliku źródłowego';status(`Wykryto łącznie ${tracks.length} fragmentów z ${selected.length} plików. Przeciągnij utwory myszką, aby ustawić kolejność.`,'good');progress(100);
+ }catch(err){console.error(err);status('Nie udało się analizować WAV: '+err.message,'warn');}
+ $('detectBtn').disabled=!sourceFiles.some(Boolean);
 }
 $('detectBtn').onclick=detectTracks;
+function applyOrder(){const order=$('order').value;if(order==='shuffle')tracks.sort(()=>Math.random()-.5);else if(order==='shortlong')tracks.sort((a,b)=>(a.end-a.start)-(b.end-b.start));else if(order==='longshort')tracks.sort((a,b)=>(b.end-b.start)-(a.end-a.start));invalidateMix();}
 function renderTracks(){
- const order=$('order').value;
- if(order==='shuffle')tracks.sort(()=>Math.random()-.5);
- if(order==='shortlong')tracks.sort((a,b)=>(a.end-a.start)-(b.end-b.start));
- if(order==='longshort')tracks.sort((a,b)=>(b.end-b.start)-(a.end-a.start));
  $('trackCount').textContent=`${tracks.length} ${tracks.length===1?'utwór':tracks.length<5?'utwory':'utworów'}`;
- if(!tracks.length){$('tracks').innerHTML='<div class="empty">Brak wykrytych utworów.</div>';return;}
- $('tracks').innerHTML='';
+ if(!tracks.length){$('tracks').innerHTML='<div class="empty">Brak wykrytych utworów.</div>';return;}$('tracks').innerHTML='';
  tracks.forEach((t,i)=>{
-  const el=document.createElement('div');el.className='track';
+  const el=document.createElement('div');el.className='track';el.draggable=true;el.dataset.trackId=t.id;
+  el.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',t.id);e.dataTransfer.effectAllowed='move';el.classList.add('dragging');});
+  el.addEventListener('dragend',()=>{el.classList.remove('dragging');document.querySelectorAll('.track.drag-over').forEach(x=>x.classList.remove('drag-over'));});
+  el.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';el.classList.add('drag-over');});
+  el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+  el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag-over');const id=e.dataTransfer.getData('text/plain'),from=tracks.findIndex(x=>x.id===id),to=tracks.findIndex(x=>x.id===t.id);if(from<0||to<0||from===to)return;const [moved]=tracks.splice(from,1);tracks.splice(to,0,moved);$('order').value='manual';invalidateMix();renderTracks();});
   const num=document.createElement('div');num.className='num';num.textContent=String(i+1).padStart(2,'0');
-  const info=document.createElement('div');info.innerHTML=`<div class="trackname"></div><div class="trackmeta">${fmtTime(t.start)} – ${fmtTime(t.end)} · ${fmtTime(t.end-t.start)}</div>`;info.querySelector('.trackname').textContent=t.label;
-  const controls=document.createElement('div');controls.className='trackcontrols';
-  const up=document.createElement('button');up.className='btn small';up.textContent='↑';up.title='Przesuń w górę';up.disabled=i===0;up.onclick=()=>{[tracks[i-1],tracks[i]]=[tracks[i],tracks[i-1]];renderTracks();};
-  const down=document.createElement('button');down.className='btn small';down.textContent='↓';down.title='Przesuń w dół';down.disabled=i===tracks.length-1;down.onclick=()=>{[tracks[i+1],tracks[i]]=[tracks[i],tracks[i+1]];renderTracks();};
-  const del=document.createElement('button');del.className='btn small';del.textContent='×';del.title='Usuń fragment';del.onclick=()=>{tracks.splice(i,1);renderTracks();$('mixBtn').disabled=!tracks.length;};
-  controls.append(up,down,del);el.append(num,info,controls);$('tracks').append(el);
+  const info=document.createElement('div');const name=document.createElement('div');name.className='trackname';name.textContent=t.label;const badge=document.createElement('span');badge.className='source-badge';badge.textContent='WAV '+(t.sourceIndex+1);name.appendChild(badge);const meta=document.createElement('div');meta.className='trackmeta';meta.textContent=`${fmtTime(t.start)} – ${fmtTime(t.end)} · ${fmtTime(t.end-t.start)} · ${t.sourceName}`;info.append(name,meta);
+  const controls=document.createElement('div');controls.className='trackcontrols';const del=document.createElement('button');del.className='btn small';del.textContent='×';del.title='Usuń utwór';del.setAttribute('aria-label','Usuń '+t.label);del.onclick=()=>{tracks.splice(i,1);invalidateMix();renderTracks();$('mixBtn').disabled=!tracks.length;$('webmBtn').disabled=true;};controls.append(del);el.append(num,info,controls);$('tracks').append(el);
  });
 }
-$('order').onchange=()=>{renderTracks();};
+$('order').onchange=()=>{applyOrder();renderTracks();};
 async function exportLargeWav(){
- if(!sourceFile||!tracks.length)return;
- if(!window.showSaveFilePicker){
-  status('Ta wersja Chrome nie udostępnia zapisu strumieniowego. Zaktualizuj Chrome lub otwórz stronę w najnowszym Chrome. Dla pliku 1 GB nie użyję pobierania przez RAM, bo mogłoby znów zabraknąć pamięci.','warn');return;
- }
- $('mixBtn').disabled=true;$('exportBtn').disabled=true;clearDownloads();progress(0);
- let writable=null;
+ if(!tracks.length)return;
+ if(!window.showSaveFilePicker){status('Zapis strumieniowy wymaga aktualnego Chrome na komputerze. Nie użyję pobierania przez RAM, aby uniknąć problemów z dużymi plikami.','warn');return;}
+ $('mixBtn').disabled=true;$('webmBtn').disabled=true;clearDownloads();progress(0);let writable=null;
  try{
-  status('Sprawdzam format WAV…');
-  const info=await readWavInfo(sourceFile);
-  if(info.format!==1||![8,16,24,32].includes(info.bits))throw new Error('Eksport strumieniowy obecnie obsługuje WAV PCM 8/16/24/32-bit.');
-  const sr=info.sampleRate,ch=info.channels,srcBytes=info.bits/8,frameBytes=info.blockAlign;
-  const parts=tracks.map(t=>({start:Math.max(0,Math.floor(t.start*sr)),end:Math.min(info.frames,Math.floor(t.end*sr))})).filter(p=>p.end>p.start);
+  status('Sprawdzam formaty źródłowych plików WAV…');
+  for(let i=0;i<3;i++)if(sourceFiles[i]&&!sourceInfos[i])sourceInfos[i]=await readWavInfo(sourceFiles[i]);
+  const parts=tracks.map(t=>{const info=sourceInfos[t.sourceIndex];if(!info)throw new Error('Brak danych źródłowych dla '+t.label);return {...t,info,file:sourceFiles[t.sourceIndex],startFrame:Math.max(0,Math.floor(t.start*info.sampleRate)),endFrame:Math.min(info.frames,Math.floor(t.end*info.sampleRate))};}).filter(p=>p.endFrame>p.startFrame);
   if(!parts.length)throw new Error('Brak poprawnych fragmentów do eksportu.');
-  const fadeSeconds=Math.min(5,Math.max(0,+$('crossfade').value));
-  const fades=[];
-  for(let i=1;i<parts.length;i++)fades.push(Math.min(Math.floor(fadeSeconds*sr),Math.floor((parts[i-1].end-parts[i-1].start)*.45),Math.floor((parts[i].end-parts[i].start)*.45)));
-  const outFrames=parts.reduce((sum,p)=>sum+p.end-p.start,0)-fades.reduce((a,b)=>a+b,0);
-  const dataBytes=outFrames*ch*2;
-  if(dataBytes>0xffffffff-36)throw new Error('Wynik przekroczył limit klasycznego WAV (około 4 GB).');
-  const handle=await window.showSaveFilePicker({suggestedName:(sourceFile.name.replace(/\.[^.]+$/,'')||'mix')+'_mix.wav',types:[{description:'WAV audio',accept:{'audio/wav':['.wav']}}]});
-  savedMixHandle=handle;
-  writable=await handle.createWritable();
-  const header=new ArrayBuffer(44),v=new DataView(header);
-  const str=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
-  str(0,'RIFF');v.setUint32(4,36+dataBytes,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,sr,true);v.setUint32(28,sr*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,dataBytes,true);
-  await writable.write(new Uint8Array(header));
+  const first=parts[0].info,sr=first.sampleRate,ch=first.channels;
+  for(const p of parts){if(p.info.format!==1||![8,16,24,32].includes(p.info.bits))throw new Error(`Eksport WAV obsługuje źródła PCM 8/16/24/32-bit. Nieobsługiwany format w pliku: ${p.sourceName}`);if(p.info.sampleRate!==sr)throw new Error('Wszystkie trzy pliki muszą mieć tę samą częstotliwość próbkowania. Zmień częstotliwość plików WAV, aby była jednakowa.');if(p.info.channels!==ch)throw new Error('Wszystkie pliki muszą mieć taką samą liczbę kanałów (mono/stereo).');}
+  const fadeSeconds=Math.min(5,Math.max(0,+$('crossfade').value)),fades=[];for(let i=1;i<parts.length;i++)fades.push(Math.min(Math.floor(fadeSeconds*sr),Math.floor((parts[i-1].endFrame-parts[i-1].startFrame)*.45),Math.floor((parts[i].endFrame-parts[i].startFrame)*.45)));
+  const outFrames=parts.reduce((sum,p)=>sum+p.endFrame-p.startFrame,0)-fades.reduce((a,b)=>a+b,0),dataBytes=outFrames*ch*2;if(dataBytes>0xffffffff-36)throw new Error('Wynik przekroczył limit klasycznego WAV (około 4 GB).');
+  const baseName=parts[0].file.name.replace(/\.[^.]+$/,'')||'mix';const handle=await window.showSaveFilePicker({suggestedName:baseName+'_mix.wav',types:[{description:'WAV audio',accept:{'audio/wav':['.wav']}}]});savedMixHandle=handle;writable=await handle.createWritable();
+  const header=new ArrayBuffer(44),v=new DataView(header),str=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};str(0,'RIFF');v.setUint32(4,36+dataBytes,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,sr,true);v.setUint32(28,sr*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,dataBytes,true);await writable.write(new Uint8Array(header));
   const chunkFrames=Math.max(4096,Math.floor(sr*2));
-  const readSamples=async(startFrame,count)=>{
-   const ab=await sourceFile.slice(info.offset+startFrame*frameBytes,info.offset+(startFrame+count)*frameBytes).arrayBuffer();
-   const view=new DataView(ab),out=Array.from({length:ch},()=>new Float32Array(count));
-   for(let i=0;i<count;i++)for(let c=0;c<ch;c++)out[c][i]=sampleAt(view,i*frameBytes+c*srcBytes,info.bits,info.format);
-   return out;
-  };
-  const writePcm16=async(channels,count)=>{
-   const ab=new ArrayBuffer(count*ch*2),view=new DataView(ab);let off=0;
-   for(let i=0;i<count;i++)for(let c=0;c<ch;c++){let x=Math.max(-1,Math.min(1,channels[c][i]));view.setInt16(off,x<0?x*32768:x*32767,true);off+=2;}
-   await writable.write(new Uint8Array(ab));
-  };
-  let completed=0;
-  // Keep only a short tail in memory so it can be crossfaded with the next segment.
-  let pendingTail=null, pendingCount=0;
-  for(let pi=0;pi<parts.length;pi++){
-   const p=parts[pi],len=p.end-p.start,fadeIn=pi>0?fades[pi-1]:0,fadeOut=pi<parts.length-1?fades[pi]:0;
-   let pos=0;
-   if(pi>0&&pendingTail&&fadeIn>0){
-    const head=await readSamples(p.start,fadeIn);
-    const mixed=Array.from({length:ch},(_,c)=>new Float32Array(fadeIn));
-    for(let i=0;i<fadeIn;i++){const x=(i+1)/(fadeIn+1);for(let c=0;c<ch;c++)mixed[c][i]=pendingTail[c][i]*Math.cos(x*Math.PI/2)+head[c][i]*Math.sin(x*Math.PI/2);}
-    await writePcm16(mixed,fadeIn);pos=fadeIn;completed+=fadeIn;
-   }else if(pi>0&&pendingTail){await writePcm16(pendingTail,pendingCount);completed+=pendingCount;pos=0;}
-   const bodyEnd=len-fadeOut;
-   while(pos<bodyEnd){
-    const n=Math.min(chunkFrames,bodyEnd-pos),chunk=await readSamples(p.start+pos,n);
-    await writePcm16(chunk,n);pos+=n;completed+=n;
-    progress(5+90*completed/outFrames);
-    status(`Zapisuję WAV etapami na dysk: ${Math.min(100,Math.round(100*completed/outFrames))}%`);
-   }
-   if(fadeOut>0){pendingTail=await readSamples(p.end-fadeOut,fadeOut);pendingCount=fadeOut;}
-   else {pendingTail=null;pendingCount=0;}
+  const readSamples=async(part,startFrame,count)=>{const inf=part.info,srcBytes=inf.bits/8,frameBytes=inf.blockAlign,ab=await part.file.slice(inf.offset+startFrame*frameBytes,inf.offset+(startFrame+count)*frameBytes).arrayBuffer(),view=new DataView(ab),out=Array.from({length:ch},()=>new Float32Array(count));for(let i=0;i<count;i++)for(let c=0;c<ch;c++)out[c][i]=sampleAt(view,i*frameBytes+c*srcBytes,inf.bits,inf.format);return out;};
+  const writePcm16=async(channels,count)=>{const ab=new ArrayBuffer(count*ch*2),view=new DataView(ab);let off=0;for(let i=0;i<count;i++)for(let c=0;c<ch;c++){const x=Math.max(-1,Math.min(1,channels[c][i]));view.setInt16(off,x<0?x*32768:x*32767,true);off+=2;}await writable.write(new Uint8Array(ab));};
+  let completed=0,pendingTail=null,pendingCount=0;
+  for(let pi=0;pi<parts.length;pi++){const part=parts[pi],len=part.endFrame-part.startFrame,fadeIn=pi>0?fades[pi-1]:0,fadeOut=pi<parts.length-1?fades[pi]:0;let pos=0;
+   if(pi>0&&pendingTail&&fadeIn>0){const head=await readSamples(part,part.startFrame,fadeIn),mixed=Array.from({length:ch},()=>new Float32Array(fadeIn));for(let i=0;i<fadeIn;i++){const x=(i+1)/(fadeIn+1);for(let c=0;c<ch;c++)mixed[c][i]=pendingTail[c][i]*Math.cos(x*Math.PI/2)+head[c][i]*Math.sin(x*Math.PI/2);}await writePcm16(mixed,fadeIn);pos=fadeIn;completed+=fadeIn;}else if(pi>0&&pendingTail){await writePcm16(pendingTail,pendingCount);completed+=pendingCount;pos=0;}
+   const bodyEnd=len-fadeOut;while(pos<bodyEnd){const n=Math.min(chunkFrames,bodyEnd-pos),chunk=await readSamples(part,part.startFrame+pos,n);await writePcm16(chunk,n);pos+=n;completed+=n;progress(5+90*completed/outFrames);status(`Zapisuję miks WAV etapami: ${Math.min(100,Math.round(100*completed/outFrames))}%`);}
+   if(fadeOut>0){pendingTail=await readSamples(part,part.endFrame-fadeOut,fadeOut);pendingCount=fadeOut;}else{pendingTail=null;pendingCount=0;}
   }
-  if(pendingTail&&pendingCount){await writePcm16(pendingTail,pendingCount);completed+=pendingCount;}
-  await writable.close();writable=null;
-  status('Gotowe! Miks WAV został zapisany bezpośrednio na dysku.','good');progress(100);
- }catch(err){
-  if(writable){try{await writable.abort();}catch(_){}}
-  console.error(err);status('Nie udało się zapisać WAV: '+(err.message||err),'warn');
- }finally{$('mixBtn').disabled=!tracks.length;$('webmBtn').disabled=!tracks.length;$('exportBtn').disabled=true;}
+  if(pendingTail&&pendingCount){await writePcm16(pendingTail,pendingCount);completed+=pendingCount;}await writable.close();writable=null;status('Gotowe! Miks z wybranych utworów został zapisany na dysku. Możesz teraz wyeksportować go do WebM.','good');progress(100);$('webmBtn').disabled=false;
+ }catch(err){if(writable){try{await writable.abort();}catch(_){}}console.error(err);savedMixHandle=null;status('Nie udało się zapisać WAV: '+(err.message||err),'warn');}
+ finally{$('mixBtn').disabled=!tracks.length;$('webmBtn').disabled=!savedMixHandle;$('exportBtn').disabled=true;}
 }
 function encodeWav(channels,sr){
  const ch=channels.length,n=channels[0].length,bytes=44+n*ch*2,buf=new ArrayBuffer(bytes),v=new DataView(buf);
@@ -273,7 +211,7 @@ $('webmBtn').onclick=async()=>{
  $('webmBtn').disabled=true;$('mixBtn').disabled=true;clearDownloads();progress(0);
  try{
   if(!savedMixHandle){
-   status('Najpierw kliknij „Zapisz miks WAV na dysk”. Eksport WebM użyje wtedy właśnie tego pliku, bez ponownego wybierania go.','warn');
+   status('Najpierw kliknij „Zapisz miks WAV na dysk”. Eksport WebM użyje utworzonego miksu.','warn');
    return;
   }
   const file=await savedMixHandle.getFile();
@@ -356,7 +294,7 @@ $('webmBtn').onclick=async()=>{
   if(mediaEl){mediaEl.pause();mediaEl.removeAttribute('src');}
   if(objectUrl)URL.revokeObjectURL(objectUrl);
   if(audioCtx){try{await audioCtx.close();}catch(_){}}
-  $('webmBtn').disabled=!tracks.length;$('mixBtn').disabled=!tracks.length;
+  $('webmBtn').disabled=!savedMixHandle;$('mixBtn').disabled=!tracks.length;
  }
 };
 reset();
