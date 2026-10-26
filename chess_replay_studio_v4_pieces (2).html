@@ -1,0 +1,105 @@
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chess Replay Studio</title>
+<style>
+:root{--bg:#17191b;--panel:#222528;--line:#383d40;--txt:#f4f5f6;--muted:#aab1b6;--green:#a6c88a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,Segoe UI,sans-serif}header{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.logo{font-weight:850;letter-spacing:.08em}.logo span{color:var(--green)}small,.muted{color:var(--muted)}main{max-width:1150px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:minmax(300px,1.1fr) minmax(290px,.9fr);gap:20px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;min-width:0}h2{font-size:17px;margin:0 0 14px}canvas{display:block;width:100%;height:auto;border-radius:4px;background:#779556}.controls{display:flex;gap:7px;justify-content:center;align-items:center;flex-wrap:wrap;margin:12px 0}button,.filelabel{background:#303438;border:1px solid #4a5054;color:var(--txt);border-radius:9px;padding:10px 12px;cursor:pointer;font-weight:650}button:hover,.filelabel:hover{border-color:var(--green)}.primary{background:var(--green);border-color:var(--green);color:#182016}button:disabled{opacity:.45}input[type=file]{display:none}input[type=range]{width:100%;accent-color:var(--green)}textarea{width:100%;min-height:120px;background:#17191b;color:var(--txt);border:1px solid #454b50;border-radius:9px;padding:10px;font:13px monospace}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0}.status{color:var(--green);font-size:13px;margin:9px 0;min-height:20px}.settings{display:grid;grid-template-columns:1fr 1fr;gap:10px}.setting{background:#191b1d;border-radius:9px;padding:10px}.setting label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}select{max-width:100%;background:#17191b;color:var(--txt);border:1px solid #454b50;border-radius:7px;padding:7px}.moves{max-height:150px;overflow:auto;background:#191b1d;border-radius:8px;padding:8px;font:13px/1.9 monospace}.move{padding:2px 4px;cursor:pointer;border-radius:4px}.move.active{background:var(--green);color:#182016}footer{max-width:1150px;margin:auto;padding:0 16px 24px;color:var(--muted);font-size:12px}@media(max-width:780px){main{grid-template-columns:1fr;margin-top:12px;padding:0 9px}header{padding:16px}.panel{padding:11px}}
+</style></head><body>
+<header><div class="logo">CHESS <span>REPLAY</span> STUDIO</div><small>PGN → automatyczne odtwarzanie → wideo</small></header>
+<main><section class="panel"><h2>Podgląd partii</h2><canvas id="board" width="900" height="900"></canvas>
+<div class="controls"><button id="first">|◀</button><button id="prev">◀</button><button class="primary" id="play">▶ Odtwarzaj</button><button id="next">▶</button><button id="last">▶|</button></div>
+<div class="row"><span id="moveLabel">Pozycja początkowa</span><span class="muted" id="counter">0 / 0</span></div><input id="timeline" type="range" min="0" max="0" value="0">
+<div class="row"><span class="muted">Tempo odtwarzania</span><b><span id="speedLabel">0,8</span> s/ruch</b></div><input id="speed" type="range" min="0.2" max="2.5" step="0.1" value="0.8"></section>
+<section class="panel"><h2>1. Wczytaj PGN</h2><label class="filelabel" for="file">Wybierz plik .pgn</label> <span id="filename" class="muted">lub wklej zapis poniżej</span><input id="file" type="file" accept=".pgn,.txt">
+<textarea id="pgn" placeholder='[Event "Partia"]&#10;&#10;1. e4 e5 2. Nf3 Nc6'></textarea><div class="controls" style="justify-content:flex-start"><button class="primary" id="load">Wczytaj PGN</button><button id="example">Przykład</button></div><div class="status" id="status">Wczytaj plik PGN, aby zacząć.</div>
+<h2 style="margin-top:20px">2. Muzyka do filmu</h2>
+<div class="setting" style="margin-bottom:12px">
+  <label for="musicFile">Wczytaj podkład muzyczny (MP3 / WAV)</label>
+  <input id="musicFile" type="file" accept=".mp3,.wav,audio/mpeg,audio/wav,audio/wave">
+  <label class="filelabel" for="musicFile">Wybierz plik muzyczny</label>
+  <span id="musicName" class="muted">Nie wybrano muzyki</span>
+  <div class="row"><label for="musicVolume" style="margin:0">Głośność muzyki</label><b><span id="musicVolumeLabel">80%</span></b></div>
+  <input id="musicVolume" type="range" min="0" max="100" value="80">
+  <p class="muted" style="margin-bottom:0">Muzyka zostanie dodana do eksportowanego filmu. Jeśli utwór jest krótszy niż partia, zapętli się; jeśli dłuższy, zostanie przycięty do długości filmu.</p>
+</div>
+<h2 style="margin-top:20px">3. Ustawienia wideo</h2><div class="settings">
+<div class="setting"><label>Rozdzielczość</label><select id="resolution"><option value="720">720 × 720</option><option value="1080" selected>1080 × 1080</option></select></div>
+<div class="setting"><label>Klatki na sekundę</label><select id="fps"><option>30</option><option>60</option></select></div>
+<div class="setting"><label>Pauza po ruchu</label><select id="hold"><option value=".2">0,2 s</option><option value=".5">0,5 s</option><option value="1" selected>1 s</option><option value="1.5">1,5 s</option></select></div>
+<div class="setting"><label>Kolory pól</label><select id="theme"><option value="green">Zielone</option><option value="blue">Niebieskie</option><option value="brown">Brązowe</option></select></div></div>
+<div class="row"><span class="muted">Szacowany czas</span><b id="duration">—</b></div><button id="export" class="primary" style="width:100%;padding:14px">● Generuj plik wideo (.webm)</button><div class="status" id="exportStatus">Eksport działa w przeglądarce. Nie zamykaj karty.</div>
+<p class="muted">Wideo jest zapisywane jako WebM. Do MP4 możesz przekonwertować je w darmowym HandBrake. Wymagany Chrome lub Edge i internet do wczytania biblioteki szachowej.</p><h2>Ruchy</h2><div class="moves" id="moves">Brak wczytanej partii.</div></section></main>
+<footer>Chess Replay Studio · PGN player do tworzenia filmów z partii szachowych.</footer><canvas id="out" width="1080" height="1080" hidden></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script>
+(()=>{const $=x=>document.getElementById(x),board=$('board'),ctx=board.getContext('2d'),out=$('out'),oc=out.getContext('2d'),files='abcdefgh',glyph={wk:'♔',wq:'♕',wr:'♖',wb:'♗',wn:'♘',wp:'♙',bk:'♚',bq:'♛',br:'♜',bb:'♝',bn:'♞',bp:'♟'};
+function drawPiece(c,k,cx,cy,size){const white=k[0]==='w',type=k[1],fill=white?'#fffef8':'#17191b',stroke=white?'#252820':'#f0eee5',lw=size*.055; c.save();c.translate(cx-size*.36,cy-size*.39);c.scale(size*.72,size*.78);c.lineWidth=lw/size/.72;c.lineJoin='round';c.lineCap='round';c.fillStyle=fill;c.strokeStyle=stroke;const path=(d)=>{let p=new Path2D(d);c.fill(p);c.stroke(p)};if(type==='p'){path('M50 10 C37 10 30 20 32 31 C33 39 39 43 43 45 L32 70 L22 82 L18 91 L82 91 L78 82 L68 70 L57 45 C64 40 69 34 68 26 C67 17 60 10 50 10 Z')}else if(type==='r'){path('M23 12 L39 12 L39 25 L48 25 L48 12 L62 12 L62 25 L76 25 L72 68 L81 82 L84 91 L16 91 L19 82 L28 68 Z')}else if(type==='b'){path('M50 8 C39 18 35 26 42 35 C45 39 49 41 50 42 C42 48 38 57 35 69 L25 81 L18 91 L82 91 L75 81 L65 69 C62 57 58 48 50 42 C62 34 64 23 50 8 Z');c.beginPath();c.moveTo(42,24);c.lineTo(58,52);c.stroke()}else if(type==='q'){path('M18 27 L29 49 L34 33 L43 49 L50 18 L58 49 L68 33 L73 49 L83 27 L75 70 L83 82 L86 91 L14 91 L17 82 L25 70 Z');for(const [x,y] of [[18,20],[34,25],[50,10],[67,25],[83,20]]){c.beginPath();c.arc(x,y,5,0,Math.PI*2);c.fill();c.stroke()}}else if(type==='k'){path('M43 8 L57 8 L57 25 L72 25 L72 38 L57 38 L57 49 C62 55 66 62 68 71 L80 82 L84 91 L16 91 L20 82 L32 71 C34 62 38 55 43 49 L43 38 L28 38 L28 25 L43 25 Z')}else if(type==='n'){path('M20 88 L20 77 L29 65 L26 50 L31 35 L44 19 L63 11 L78 18 L73 31 L83 42 L76 52 L62 51 L57 63 L69 75 L81 83 L84 91 L16 91 Z');c.beginPath();c.arc(62,27,2.6,0,Math.PI*2);c.fillStyle=white?'#252820':'#f0eee5';c.fill()}c.restore()}
+const themes={green:['#eeeed2','#779556'],blue:['#e8edf3','#7392b8'],brown:['#f0d9b5','#b58863']};let fens=[],san=[],idx=0,timer=null,playing=false,musicFile=null,musicUrl=null;
+const example='[Event "Casual Game"]\\n[White "Player 1"]\\n[Black "Player 2"]\\n\\n1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O *';
+function loadPgn(t){if(!window.Chess)throw Error('Nie udało się załadować biblioteki szachowej. Sprawdź internet i odśwież stronę.');let g=new Chess();if(!g.load_pgn(t,{sloppy:true}))throw Error('Nie udało się odczytać PGN. Sprawdź poprawność pliku.');let hist=g.history({verbose:true}),r=new Chess();fens=[r.fen()];san=[];for(const m of hist){san.push(m.san);r.move(m);fens.push(r.fen())}idx=0;stop();renderMoves();draw();ui();$('status').textContent=`Wczytano partię: ${san.length} półruchów.`}
+function drawBoard(c,fen,dim){let g=new Chess(fen),b=g.board(),cell=dim/8,col=themes[$('theme').value];c.clearRect(0,0,dim,dim);for(let r=0;r<8;r++)for(let f=0;f<8;f++){c.fillStyle=(r+f)%2===0?col[0]:col[1];c.fillRect(f*cell,r*cell,cell,cell);if(f===0){c.fillStyle=(r+f)%2===0?col[1]:col[0];c.font=`${cell*.13}px system-ui`;c.fillText(8-r,f*cell+cell*.04,r*cell+cell*.16)}if(r===7){c.fillStyle=(r+f)%2===0?col[1]:col[0];c.font=`${cell*.13}px system-ui`;c.fillText(files[f],f*cell+cell*.84,r*cell+cell*.96)}let p=b[r][f];if(p){let k=(p.color==='w'?'w':'b')+p.type;c.shadowColor=p.color==='w'?'rgba(0,0,0,.28)':'rgba(255,255,255,.10)';c.shadowBlur=cell*.025;drawPiece(c,k,f*cell+cell/2,r*cell+cell*.52,cell*.86);c.shadowBlur=0}}}
+function draw(){drawBoard(ctx,fens[idx]||new Chess().fen(),900)}
+function renderMoves(){let root=$('moves');root.innerHTML='';if(!san.length){root.textContent='Brak ruchów';return}san.forEach((m,i)=>{if(i%2===0){let n=document.createElement('b');n.textContent=(i/2+1)+'. ';root.append(n)}let s=document.createElement('span');s.className='move'+(idx===i+1?' active':'');s.textContent=m+' ';s.onclick=()=>{stop();idx=i+1;draw();ui()};root.append(s)})}
+function ui(){$('counter').textContent=`${idx} / ${san.length}`;$('timeline').max=san.length;$('timeline').value=idx;$('moveLabel').textContent=idx===0?'Pozycja początkowa':`${Math.ceil(idx/2)}${idx%2?'...':''} ${san[idx-1]||''}`;$('speedLabel').textContent=Number($('speed').value).toFixed(1).replace('.',',');$('duration').textContent=san.length?`${Math.ceil(1+san.length*(Number($('speed').value)+Number($('hold').value)))} s`:'—';renderMoves()}
+let animationFrame=0;
+function stop(){if(timer)clearTimeout(timer);if(animationFrame)cancelAnimationFrame(animationFrame);timer=null;animationFrame=0;playing=false;$('play').textContent='▶ Odtwarzaj'}
+function drawAnimatedMove(fromFen,toFen,move,t){
+ const dim=board.width,cell=dim/8,col=themes[$('theme').value],from=new Chess(fromFen).board(),to=new Chess(toFen).board();
+ // Draw destination position, then restore the mover's source square and animate the piece over it.
+ drawBoard(ctx,toFen,dim);
+ const fx=files.indexOf(move.from[0]),fy=8-Number(move.from[1]),tx=files.indexOf(move.to[0]),ty=8-Number(move.to[1]);
+ const piece=from[fy][fx]; if(!piece)return;
+ ctx.fillStyle=(fx+fy)%2===0?col[0]:col[1];ctx.fillRect(fx*cell,fy*cell,cell,cell);
+ // Clear the destination square so the moving piece is never duplicated.
+ ctx.fillStyle=(tx+ty)%2===0?col[0]:col[1];ctx.fillRect(tx*cell,ty*cell,cell,cell);
+ // During the move, keep a captured piece visible until the mover reaches the target.
+ if(from[ty][tx] && t<0.82){const captured=from[ty][tx];ctx.fillStyle=(tx+ty)%2===0?col[0]:col[1];ctx.fillRect(tx*cell,ty*cell,cell,cell);const ck=(captured.color==='w'?'w':'b')+captured.type;drawPiece(ctx,ck,tx*cell+cell/2,ty*cell+cell*.52,cell*.86);}
+ const eased=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+ const x=(fx+(tx-fx)*eased)*cell+cell/2,y=(fy+(ty-fy)*eased)*cell+cell*.53,k=(piece.color==='w'?'w':'b')+piece.type;
+ ctx.shadowColor=piece.color==='w'?'rgba(0,0,0,.22)':'rgba(255,255,255,.08)';ctx.shadowBlur=cell*.025;drawPiece(ctx,k,x,y,cell*.86);ctx.shadowBlur=0;
+}
+function animatePreview(nextIndex,done){
+ const fromIdx=idx,toIdx=nextIndex; if(toIdx<=0||toIdx>san.length){idx=toIdx;draw();ui();done&&done();return}
+ const game=new Chess(fens[fromIdx]);const move=game.move(san[toIdx-1]);const fromFen=fens[fromIdx],toFen=fens[toIdx],duration=Math.max(180,Number($('speed').value)*1000);
+ const start=performance.now();
+ function step(now){if(!playing&&done===undefined)return;const t=Math.min(1,(now-start)/duration);drawAnimatedMove(fromFen,toFen,move,t);if(t<1){animationFrame=requestAnimationFrame(step)}else{idx=toIdx;animationFrame=0;draw();ui();if(done)done()}}
+ animationFrame=requestAnimationFrame(step);
+}
+function tick(){if(!playing)return;if(idx>=san.length){stop();return}animatePreview(idx+1,()=>{if(playing)timer=setTimeout(tick,80)})}
+function toggle(){if(playing){stop();draw();return}if(!san.length)return;if(idx>=san.length)idx=0;playing=true;$('play').textContent='Ⅱ Pauza';timer=setTimeout(tick,80)}
+$('load').onclick=()=>{try{loadPgn($('pgn').value.trim())}catch(e){$('status').textContent=e.message}};$('example').onclick=()=>{$('pgn').value=example;try{loadPgn(example)}catch(e){$('status').textContent=e.message}};$('file').onchange=e=>{let f=e.target.files[0];if(!f)return;$('filename').textContent=f.name;let r=new FileReader();r.onload=()=>{$('pgn').value=r.result;try{loadPgn(r.result)}catch(err){$('status').textContent=err.message}};r.readAsText(f)};$('play').onclick=toggle;$('first').onclick=()=>{stop();idx=0;draw();ui()};$('prev').onclick=()=>{stop();idx=Math.max(0,idx-1);draw();ui()};$('next').onclick=()=>{stop();idx=Math.min(san.length,idx+1);draw();ui()};$('last').onclick=()=>{stop();idx=san.length;draw();ui()};$('timeline').oninput=e=>{stop();idx=+e.target.value;draw();ui()};$('speed').oninput=ui;$('hold').onchange=ui;$('theme').onchange=draw;
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function frame(fen,caption,n,total,dim){drawBoard(oc,fen,dim);oc.fillStyle='#151719';oc.fillRect(0,0,dim,dim*.075);oc.fillStyle='#f3f4f6';oc.font=`bold ${dim*.027}px system-ui`;oc.textAlign='left';oc.textBaseline='middle';oc.fillText('CHESS REPLAY',dim*.035,dim*.038);oc.fillStyle='#a6c88a';oc.font=`${dim*.016}px system-ui`;oc.textAlign='right';oc.fillText('PGN PLAYER',dim*.965,dim*.038);oc.fillStyle='#151719';oc.fillRect(0,dim*.925,dim,dim*.075);oc.fillStyle='#f3f4f6';oc.font=`${dim*.022}px system-ui`;oc.textAlign='left';oc.fillText(caption,dim*.035,dim*.962);oc.fillStyle='#aab1b6';oc.font=`${dim*.016}px system-ui`;oc.textAlign='right';oc.fillText(`${n} / ${total}`,dim*.965,dim*.962)}
+$('export').onclick=async()=>{if(!san.length){$('exportStatus').textContent='Najpierw wczytaj PGN.';return}if(!out.captureStream||!window.MediaRecorder){$('exportStatus').textContent='Eksport wideo wymaga aktualnego Chrome lub Edge.';return}stop();let btn=$('export');btn.disabled=true;let dim=+$('resolution').value,fps=+$('fps').value,hold=+$('hold').value,speed=+$('speed').value;out.width=dim;out.height=dim;let stream=out.captureStream(fps),audioCtx=null,audioEl=null,audioStream=null;
+if(musicFile&&musicUrl){
+ audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+ await audioCtx.resume();
+ audioEl=new Audio();audioEl.src=musicUrl;audioEl.loop=true;audioEl.preload='auto';audioEl.volume=1;
+ await new Promise((resolve,reject)=>{audioEl.oncanplaythrough=resolve;audioEl.onerror=()=>reject(new Error('Nie udało się odczytać pliku muzycznego.'));audioEl.load()});
+ const source=audioCtx.createMediaElementSource(audioEl),gain=audioCtx.createGain(),dest=audioCtx.createMediaStreamDestination();
+ gain.gain.value=Number($('musicVolume').value)/100;source.connect(gain);gain.connect(dest);audioStream=dest.stream;
+ audioStream.getAudioTracks().forEach(t=>stream.addTrack(t));
+}
+let mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')?'video/webm;codecs=vp9,opus':(MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm'),rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:8000000}),chunks=[];rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};let done=new Promise(resolve=>rec.onstop=()=>resolve(new Blob(chunks,{type:rec.mimeType})));rec.start(250);if(audioEl){audioEl.currentTime=0;await audioEl.play()}let delay=1000/fps;async function still(fen,cap,n,ms){let until=performance.now()+ms;while(performance.now()<until){frame(fen,cap,n,san.length,dim);await wait(delay)}}try{await still(fens[0],'Pozycja początkowa',0,900);for(let i=1;i<fens.length;i++){
+ let cap=`${Math.ceil(i/2)}${i%2?'.':'...'} ${san[i-1]}`,game=new Chess(fens[i-1]),move=game.move(san[i-1]),duration=speed*1000,begin=performance.now();
+ while(performance.now()-begin<duration){
+  let t=Math.min(1,(performance.now()-begin)/duration);
+  // Reuse the same smooth, eased movement as the live preview.
+  const dim2=dim,cell=dim2/8,col=themes[$('theme').value],from=new Chess(fens[i-1]).board(),to=new Chess(fens[i]).board();
+  drawBoard(oc,fens[i],dim2);
+  const fx=files.indexOf(move.from[0]),fy=8-Number(move.from[1]),tx=files.indexOf(move.to[0]),ty=8-Number(move.to[1]),piece=from[fy][fx];
+  if(piece){
+   oc.fillStyle=(fx+fy)%2===0?col[0]:col[1];oc.fillRect(fx*cell,fy*cell,cell,cell);
+   oc.fillStyle=(tx+ty)%2===0?col[0]:col[1];oc.fillRect(tx*cell,ty*cell,cell,cell);
+   if(from[ty][tx]&&t<.82){const capPiece=from[ty][tx],ck=(capPiece.color==='w'?'w':'b')+capPiece.type;oc.fillStyle=(tx+ty)%2===0?col[0]:col[1];oc.fillRect(tx*cell,ty*cell,cell,cell);drawPiece(oc,ck,tx*cell+cell/2,ty*cell+cell*.52,cell*.86);}
+   const e=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,x=(fx+(tx-fx)*e)*cell+cell/2,y=(fy+(ty-fy)*e)*cell+cell*.53,k=(piece.color==='w'?'w':'b')+piece.type;
+   oc.shadowColor=piece.color==='w'?'rgba(0,0,0,.22)':'rgba(255,255,255,.08)';oc.shadowBlur=cell*.025;drawPiece(oc,k,x,y,cell*.86);oc.shadowBlur=0;
+  }
+  // Brand overlays stay steady during every frame.
+  oc.fillStyle='#151719';oc.fillRect(0,0,dim,dim*.075);oc.fillStyle='#f3f4f6';oc.font=`bold ${dim*.027}px system-ui`;oc.textAlign='left';oc.textBaseline='middle';oc.fillText('CHESS REPLAY',dim*.035,dim*.038);oc.fillStyle='#a6c88a';oc.font=`${dim*.016}px system-ui`;oc.textAlign='right';oc.fillText('PGN PLAYER',dim*.965,dim*.038);oc.fillStyle='#151719';oc.fillRect(0,dim*.925,dim,dim*.075);oc.fillStyle='#f3f4f6';oc.font=`${dim*.022}px system-ui`;oc.textAlign='left';oc.fillText(cap,dim*.035,dim*.962);oc.fillStyle='#aab1b6';oc.font=`${dim*.016}px system-ui`;oc.textAlign='right';oc.fillText(`${i} / ${san.length}`,dim*.965,dim*.962);
+  await wait(1000/fps);
+ }
+ await still(fens[i],cap,i,hold*1000);$('exportStatus').textContent=`Renderowanie filmu… ${Math.round(i/san.length*100)}%`;
+}await still(fens[fens.length-1],'Koniec partii',san.length,900);rec.stop();let blob=await done,url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='chess-replay.webm';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);$('exportStatus').textContent=`Gotowe! Plik chess-replay.webm (${(blob.size/1048576).toFixed(1)} MB).`}catch(e){if(rec.state!=='inactive')rec.stop();$('exportStatus').textContent='Błąd eksportu: '+e.message}btn.disabled=false;stream.getTracks().forEach(t=>t.stop());if(audioEl){audioEl.pause();audioEl.src=''}if(audioCtx){audioCtx.close()} };
+$('musicFile').onchange=e=>{const f=e.target.files[0];if(!f)return;musicFile=f;$('musicName').textContent=f.name;if(musicUrl)URL.revokeObjectURL(musicUrl);musicUrl=URL.createObjectURL(f);$('exportStatus').textContent='Muzyka gotowa do dodania do filmu.'};
+$('musicVolume').oninput=()=>{$('musicVolumeLabel').textContent=$('musicVolume').value+'%'};
+$('pgn').value=example;try{loadPgn(example)}catch(e){$('status').textContent='Gotowe. Połączenie z internetem jest potrzebne do załadowania biblioteki.'}
+})();
+</script></body></html>
